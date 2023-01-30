@@ -1,6 +1,7 @@
 import { Camera, Engine, GamepadCamera, Scene, Vector3 } from "@babylonjs/core";
-import Radar from "./comps/sensor/Radar";
-import RadarDTO from "./comps/sensor/RadarDTO";
+import Radar from "./comps/sensors/Radar";
+import RadarDTO from "./comps/sensors/RadarDTO";
+import Aircraft from "./unit/Aircraft";
 
 export default class Core {
   constructor() {
@@ -27,9 +28,12 @@ export default class Core {
     camera.maxZ = 1000;
 
     // test radar
-    const radar = new Radar({range1m2: 60, angle: 120, esa: true}, scene);
+    // const radar = new Radar({range1m2: 60, angle: 120, esa: true}, scene);
+    const jf_17_blk3 = new Aircraft({callSign: "Tiger-1", name: "jf-17 block 3", sensors: [{type: "radar", data: {range1m2: 60, angle: 120, esa: true}}]}, scene);
 
     engine.runRenderLoop(() => {
+      jf_17_blk3.rotate(new Vector3(0, 0, 1), 0.1 * Math.PI / 180);
+      
       scene.render();
     });
     

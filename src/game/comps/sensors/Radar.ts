@@ -1,11 +1,14 @@
-import { float, MeshBuilder, Scene, Vector2, Vector3 } from "@babylonjs/core";
+import Unit from "@/game/unit/Unit";
+import { float, Mesh, MeshBuilder, Scene, Vector2, Vector3 } from "@babylonjs/core";
+import Sensor from "../Sensor";
 import RadarDTO from "./RadarDTO";
 
-export default class Radar {
+export default class Radar extends Sensor {
   radarDTO: RadarDTO;
-  scene: Scene;
 
-  constructor(radarDTO: RadarDTO, scene: Scene) {
+  constructor(radarDTO: RadarDTO, parent: Unit, scene: Scene) {
+    super(parent, scene);
+
     this.radarDTO = radarDTO;
     this.scene = scene;
 
@@ -17,9 +20,13 @@ export default class Radar {
     return this.radarDTO.range1m2 * Math.pow(rcs, 1/4);
   }
 
+  // update
+  update(): void {
+    return
+  }
+
   // ui
   ui(): void {
-    this.draw50m2();
     this.draw5m2();
   }
 
@@ -69,6 +76,7 @@ export default class Radar {
       updatable: true,
     };
     
-    MeshBuilder.CreateLines("lines", line, this.scene);
+    const mesh:Mesh = MeshBuilder.CreateLines("lines", line, this.scene);
+    mesh.parent = this.parent;
   }
 }
