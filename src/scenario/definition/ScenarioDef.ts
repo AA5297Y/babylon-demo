@@ -1,5 +1,5 @@
-import Aircraft from "@/game/unit/Aircraft/Aircraft";
-import UnitDTO from "@/game/unit/UnitDTO";
+import Aircraft from "@/unit/Aircraft/Aircraft";
+import UnitDTO from "@/unit/UnitDTO";
 
 export default interface ScenarioDef {
   name: string;

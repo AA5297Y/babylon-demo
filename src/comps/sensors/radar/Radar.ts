@@ -1,4 +1,4 @@
-import Unit from "@/game/unit/Unit";
+import Unit from "@/unit/Unit";
 import { float, Mesh, MeshBuilder, Scene, Vector2, Vector3 } from "@babylonjs/core";
 import Sensor from "../Sensor";
 import RadarDTO from "./RadarDTO";

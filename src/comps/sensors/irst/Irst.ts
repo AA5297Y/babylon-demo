@@ -1,4 +1,4 @@
-import Unit from "@/game/unit/Unit";
+import Unit from "@/unit/Unit";
 import { Scene } from "@babylonjs/core";
 import Sensor from "../Sensor";
 import IrstDTO from "./IRSTDTO";
