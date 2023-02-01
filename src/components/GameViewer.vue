@@ -6,7 +6,7 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 
-import Core from '@/game/Core';
+import Game from '@/game/Game';
 
 @Options({
   data: () => {
@@ -15,7 +15,7 @@ import Core from '@/game/Core';
     }
   },
   mounted: () => {
-    new Core();
+    new Game();
   }
 })
 export default class GameViewer extends Vue {}

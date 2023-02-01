@@ -1,6 +1,6 @@
 import { Scene } from "@babylonjs/core";
-import Unit from "../unit/Unit";
-import Component from "./Component";
+import Unit from "../../unit/Unit";
+import Component from "../Component";
 
 export default class Sensor extends Component {
   scene: Scene;

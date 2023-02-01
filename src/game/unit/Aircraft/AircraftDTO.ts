@@ -1,4 +1,5 @@
-import SensorDTO from "../comps/SensorDTO";
+import { Vector3 } from "@babylonjs/core";
+import SensorDTO from "../../comps/sensors/SensorDTO";
 
 export default interface AircraftDTO {
   callSign: string;

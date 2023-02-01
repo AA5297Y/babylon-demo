@@ -1,20 +1,20 @@
-import { Scene } from "@babylonjs/core";
-import Sensor from "../comps/Sensor";
-import SensorDTO from "../comps/SensorDTO";
-import Irst from "../comps/sensors/Irst";
-import IrstDTO from "../comps/sensors/IrstDTO";
-import Radar from "../comps/sensors/Radar";
-import RadarDTO from "../comps/sensors/RadarDTO";
+import { Scene, Vector3 } from "@babylonjs/core";
+import Sensor from "../../comps/sensors/Sensor";
+import SensorDTO from "../../comps/sensors/SensorDTO";
+import Irst from "../../comps/sensors/irst/Irst";
+import IrstDTO from "../../comps/sensors/irst/IrstDTO";
+import Radar from "../../comps/sensors/radar/Radar";
+import RadarDTO from "../../comps/sensors/radar/RadarDTO";
 import AircraftDTO from "./AircraftDTO";
-import Unit from "./Unit";
+import Unit from "../Unit";
 
 export default class Aircraft extends Unit {
   aircraftDTO: AircraftDTO;
 
   sensors: Sensor[] = [];
   
-  constructor(aircraftDTO: AircraftDTO, scene: Scene) {
-    super(aircraftDTO.callSign, scene);
+  constructor(aircraftDTO: AircraftDTO, scene: Scene, position: Vector3) {
+    super(aircraftDTO.callSign, scene, position);
     this.aircraftDTO = aircraftDTO;
     this.scene = scene;
 
