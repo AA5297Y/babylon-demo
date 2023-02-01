@@ -1,4 +1,4 @@
-import { Camera, UniversalCamera, Vector3 } from "@babylonjs/core";
+import { Camera, MeshBuilder, UniversalCamera, Vector3 } from "@babylonjs/core";
 import Core from "./Core";
 
 export default class CamController {

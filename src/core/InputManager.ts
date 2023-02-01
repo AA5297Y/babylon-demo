@@ -1,4 +1,4 @@
-import { Action, ActionManager, ExecuteCodeAction, float, InterpolateValueAction, SetValueAction, WebXRControllerMovement } from "@babylonjs/core";
+import { Action, ActionManager, ExecuteCodeAction, float, InterpolateValueAction, Ray, SetValueAction, WebXRControllerMovement } from "@babylonjs/core";
 import Core from "./Core";
 
 export default class InputManager {
@@ -10,6 +10,8 @@ export default class InputManager {
   xMul: float = 10;
   yMul: float = 10;
   zMul: float = 10;
+
+  m1: boolean = false;
 
   keyMap = {
     xNeg: 'arrowleft',
@@ -84,9 +86,21 @@ export default class InputManager {
     ))
 
     // mouse
-    this.core.scene.actionManager.registerAction(new ExecuteCodeAction(
-      ActionManager.OnRightPickTrigger, (ev) => {
-        console.log(ev)
+    this.core.grid.actionManager.registerAction(new ExecuteCodeAction(
+      ActionManager.OnPickDownTrigger, (ev) => {
+        this.m1 = true;
+      }
+    ))
+    this.core.grid.actionManager.registerAction(new ExecuteCodeAction(
+      ActionManager.OnPointerOverTrigger, (ev) => {
+        if(this.m1) {
+          console.log(ev)
+        }
+      }
+    ))
+    this.core.grid.actionManager.registerAction(new ExecuteCodeAction(
+      ActionManager.OnPickUpTrigger, (ev) => {
+        this.m1 = false;
       }
     ))
   }
