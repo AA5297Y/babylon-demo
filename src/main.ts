@@ -13,7 +13,7 @@ class Main {
     
     containerDiv.append(canvas);
 
-    const engine = new Engine(canvas, false);
+    const engine = new Engine(canvas, true);
     const core = new Core(canvas, engine);
         
     window.addEventListener('resize', () => {
