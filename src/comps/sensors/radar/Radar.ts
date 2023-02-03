@@ -1,18 +1,21 @@
 import Unit from "@/unit/Unit";
-import { float, Mesh, MeshBuilder, Scene, Vector2, Vector3 } from "@babylonjs/core";
+import { float, LinesMesh, Mesh, MeshBuilder, Scene, Vector2, Vector3 } from "@babylonjs/core";
 import Sensor from "../Sensor";
 import RadarDTO from "./RadarDTO";
 
 export default class Radar extends Sensor {
+  type = "radar";
   radarDTO: RadarDTO;
 
+  alyUi: LinesMesh;
+  foeUi: LinesMesh;
+
   constructor(radarDTO: RadarDTO, parent: Unit, scene: Scene) {
-    super(parent, scene);
+    super(parent);
 
     this.radarDTO = radarDTO;
-    this.scene = scene;
-
-    this.ui();
+  
+    this.initUi();
   }
 
   // compute
@@ -20,33 +23,18 @@ export default class Radar extends Sensor {
     return this.radarDTO.range1m2 * Math.pow(rcs, 1/4);
   }
 
-  // update
-  update(): void {
-    return
+  initUi() {
+    this.drawArc(this.radarDTO.defaultRcs);
+
+    this.parent.core.scene.onBeforeRenderObservable.add(() => {this.update()});
   }
 
   // ui
-  ui(): void {
-    this.draw5m2();
-  }
-
-  draw50m2(): void {
-    const range50m2 = this.rcs2Range(50);
-
-    this.drawArc(range50m2);
-  }
-
-  draw5m2(): void {
-    const range5m2 = this.rcs2Range(5);
-
-    this.drawArc(range5m2);
-  }
-
-  drawArc(range: float): void {
+  drawArc(targetRcs: number) {
     let pos: Vector3[] = [new Vector3(0, 0, 0)];
-
     let posSyn: Vector3[] = [];
 
+    const range = this.rcs2Range(targetRcs);
     const unitAng = (this.radarDTO.angle / 36) * (Math.PI / 180)
 
     for (let i = 18; i >= 1; i--) {
@@ -76,7 +64,30 @@ export default class Radar extends Sensor {
       updatable: true,
     };
     
-    const mesh:Mesh = MeshBuilder.CreateLines("lines", line, this.scene);
-    mesh.parent = this.parent;
+    this.alyUi = MeshBuilder.CreateLines("aly", line, this.parent.core.scene);
+    this.alyUi.parent = this.parent.attachedUi;
+    this.foeUi = MeshBuilder.CreateDashedLines("foe", line, this.parent.core.scene);
+    this.foeUi.parent = this.parent.attachedUi;
+  }
+
+  // update
+  update(): void {
+    if (this.parent.testFriendlyOrFoe()) {
+      this.updateAlyUi();
+    } else {
+      this.testUpdateFoeUi();
+    }
+  }
+
+  // update aly ui
+  updateAlyUi() {
+    this.alyUi.isVisible = true;
+    this.foeUi.isVisible = false;
+  }
+
+  // update foe ui
+  testUpdateFoeUi() {
+    this.alyUi.isVisible = false;
+    this.foeUi.isVisible = true;
   }
 }

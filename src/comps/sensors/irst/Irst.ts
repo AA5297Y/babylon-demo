@@ -7,7 +7,7 @@ export default class Irst extends Sensor {
   irstDTO: IrstDTO;
 
   constructor(irstDTO: IrstDTO, parent: Unit, scene: Scene) {
-    super(parent, scene);
+    super(parent);
 
     this.irstDTO = irstDTO;
   }

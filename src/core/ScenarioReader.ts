@@ -16,7 +16,7 @@ export default class ScenarioReader {
   loadUnit() {
     this.scenario.units.forEach((value) => {
       if (value.type == 'aircraft') {
-        this.core.units.push(new Aircraft(value.data, this.core.scene));
+        this.core.units.push(new Aircraft(value, this.core));
       }
     })
   }

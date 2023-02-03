@@ -3,11 +3,10 @@ import Unit from "../../unit/Unit";
 import Component from "../Component";
 
 export default class Sensor extends Component {
-  scene: Scene;
+  type: String;
 
-  constructor(parent: Unit, scene: Scene) {
+  constructor(parent: Unit) {
     super(parent);
-    this.scene = scene;
   }
 
   update(): void {

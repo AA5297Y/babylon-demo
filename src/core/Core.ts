@@ -1,8 +1,8 @@
 import NewScenario from "@/scenario/NewScenario";
-import Aircraft from "@/unit/Aircraft/Aircraft";
 import Unit from "@/unit/Unit";
 import { ActionManager, Engine, Mesh, MeshBuilder, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
 import CamController from "./CamController";
+import ContactManager from "./ContactManager";
 import InputManager from "./InputManager";
 import ScenarioReader from "./ScenarioReader";
 
@@ -15,11 +15,13 @@ export default class Core {
   grid: Mesh;
 
   inputManager: InputManager;
-  cameraControl: CamController | undefined;
+  cameraControl: CamController;
+  contactManager: ContactManager;
 
   // scenario data
   scenarioReader: ScenarioReader = null;
   units: Unit[] = [];
+  side = '0';
 
   constructor(canvas: HTMLCanvasElement, engine: Engine) {
     this.canvas = canvas;
@@ -36,6 +38,7 @@ export default class Core {
 
     this.inputManager = new InputManager(this);
     this.cameraControl = new CamController(this);
+    this.contactManager = new ContactManager(this);
 
     this.initRender();
 
@@ -62,6 +65,7 @@ export default class Core {
     });
   }
 
+  // scenario read
   testScenarioReader() {
     this.scenarioReader = new ScenarioReader(this, NewScenario);
   }
