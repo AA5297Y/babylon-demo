@@ -1,18 +1,25 @@
+import NewScenario from "@/scenario/NewScenario";
 import Aircraft from "@/unit/Aircraft/Aircraft";
 import Unit from "@/unit/Unit";
-import { ActionManager, Engine, Mesh, MeshBuilder, Scene, Vector3 } from "@babylonjs/core";
+import { ActionManager, Engine, Mesh, MeshBuilder, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
 import CamController from "./CamController";
 import InputManager from "./InputManager";
+import ScenarioReader from "./ScenarioReader";
 
 // define game loop
 export default class Core {
   canvas: HTMLCanvasElement;
   engine: Engine;
   scene: Scene | undefined;
+  // ground(raycast area)
   grid: Mesh;
 
   inputManager: InputManager;
-  camera: CamController | undefined;
+  cameraControl: CamController | undefined;
+
+  // scenario data
+  scenarioReader: ScenarioReader = null;
+  units: Unit[] = [];
 
   constructor(canvas: HTMLCanvasElement, engine: Engine) {
     this.canvas = canvas;
@@ -24,45 +31,39 @@ export default class Core {
   init(): void {
     this.scene = new Scene(this.engine);
     this.scene.actionManager = new ActionManager();
-    
-    this.grid = MeshBuilder.CreatePlane("ground", {width: 10000, height: 10000}, this.scene);
-    this.grid.position = new Vector3(0, 0, 0.5); // -926m
-    this.grid.actionManager = new ActionManager(this.scene);
+
+    this.initGround();
 
     this.inputManager = new InputManager(this);
-    this.camera = new CamController(this);
+    this.cameraControl = new CamController(this);
+
+    this.initRender();
+
+    this.testScenarioReader()
+  }
   
+  /*
+  1ft = 0.000165nm
+  1ft = 0.3048m
+  */
+  initGround() {
+    this.grid = MeshBuilder.CreatePlane("ground", {width: 10000, height: 10000}, this.scene);
+    this.grid.position = new Vector3(0, 0, 0.323974); // -600m
+    this.grid.actionManager = new ActionManager(this.scene);
+  }
+
+  initRender() {
     this.scene.debugLayer.show({
       embedMode: true
     });
 
-    this.initRender();
-  
-    const jf_17 = new Aircraft(
-      {
-        callSign: "Tiger-1",
-        name: "jf-17 block 2",
-        sensors: [
-          {type: "radar", data: {range1m2: 47, angle: 90, esa: false}}
-        ]
-      },this.scene, Vector3.Zero()
-    );
-
-    const j_20 = new Aircraft(
-      {
-        callSign: "Tiger-2",
-        name: "j-20",
-        sensors: [
-          {type: "radar", data: {range1m2: 130, angle: 120, esa: true}}
-        ]
-      },this.scene, new Vector3(100, 0, 0)
-    );
-  }
-
-  initRender() {
     this.engine.runRenderLoop(() => {
         this.scene.render();
     });
+  }
+
+  testScenarioReader() {
+    this.scenarioReader = new ScenarioReader(this, NewScenario);
   }
 
   update(): void {

@@ -155,6 +155,8 @@ export default class InputManager {
 
           // zoom
           if (this.mouseBtnMap(ev.event, this.mouseOverMap.m20)) {
+            this.panScrShift = {x: 0, y: 0};
+
             if (this.zoomLastValue != null) {
               this.zoomShift = (this.zoomLastValue - ev.event.clientY) / screen.height;
             }

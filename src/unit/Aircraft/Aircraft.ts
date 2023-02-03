@@ -12,9 +12,12 @@ export default class Aircraft extends Unit {
   aircraftDTO: AircraftDTO;
 
   sensors: Sensor[] = [];
+
+  target: Vector3 = null;
+  speedInKt: number = 480;
   
-  constructor(aircraftDTO: AircraftDTO, scene: Scene, position: Vector3) {
-    super(aircraftDTO.callSign, scene, position);
+  constructor(aircraftDTO: AircraftDTO, scene: Scene) {
+    super(aircraftDTO.callSign, scene);
     this.aircraftDTO = aircraftDTO;
     this.scene = scene;
 
@@ -22,7 +25,11 @@ export default class Aircraft extends Unit {
   }
 
   init():void {
+    this.position = this.aircraftDTO.position;
+
     this.initSensor(this.aircraftDTO.sensors);
+
+    this.initMovement();
   }
 
   initSensor(sensorsDTO: SensorDTO[]): void {
@@ -36,5 +43,44 @@ export default class Aircraft extends Unit {
           break;
       }
     })
+  }
+
+  // movement
+  initMovement() {
+    this.scene.onBeforeRenderObservable.add(() => {this.updateMovement()});
+  }
+
+  updateMovement() {
+    if (this.target == null) {
+      this.turnAround();
+    } else {
+      this.turning();
+    }
+
+    const forward = this.getForward();
+    let x = this.position.x + forward.x * this.getSpeed();
+    let y = this.position.y + forward.y * this.getSpeed();
+    let z = this.position.z + forward.z * this.getSpeed();
+
+    this.position.set(x, y, z);
+  }
+
+  turning(): void {
+    //
+  }
+
+  turnAround(): void {
+    //
+    const turnAroundAng = this.aircraftDTO.turnAroundRate * Math.PI / 180;
+    this.rotation.z += turnAroundAng / 1000 * this.getEngine().getDeltaTime();
+  }
+
+  getForward(): Vector3 {
+    return this.getDirection(new Vector3(0, 1, 0));
+  }
+
+  getSpeed(): number {
+    // 480kt
+    return (this.speedInKt / 3600) / 1000 * this.getEngine().getDeltaTime();
   }
 }
