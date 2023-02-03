@@ -21,6 +21,9 @@ export default {
         sensors: [
           {type: "radar", data: {range1m2: 45, angle: 90, esa: false, defaultRcs: 5, maxRcs: 50}}
         ],
+        comms: [
+          {type: "comm", signal: 1, range: 100, data: {name: "HF", interval: 5}}
+        ],
         turnAroundRate: 2,
         turningRate: 4,
         climbRate: 100,
@@ -37,6 +40,9 @@ export default {
         sensors: [
           {type: "radar", data: {range1m2: 60, angle: 120, esa: true, defaultRcs: 5, maxRcs: 50}}
         ],
+        comms: [
+          {type: "comm", signal: 1, range: 100, data: {name: "HF", interval: 2}}
+        ],
         turnAroundRate: 2,
         turningRate: 4,
         climbRate: 100,
@@ -52,6 +58,9 @@ export default {
       data: {
         sensors: [
           {type: "radar", data: {range1m2: 120, angle: 120, esa: true, defaultRcs: 5, maxRcs: 50}}
+        ],
+        comms: [
+          {type: "comm", signal: 1, range: 150, data: {name: "HF", interval: 2}}
         ],
         turnAroundRate: 3,
         turningRate: 5.5,

@@ -22,8 +22,13 @@ export default class Unit extends TransformNode {
   }
 
   syncAttchedUi() {
-    this.attachedUi.position = this.position;
-    this.attachedUi.rotation = this.rotation;
+    this.attachedUi.position.x = this.position.x;
+    this.attachedUi.position.y = this.position.y;
+    this.attachedUi.position.z = this.position.z;
+
+    this.attachedUi.rotation.x = this.rotation.x;
+    this.attachedUi.rotation.y = this.rotation.y;
+    this.attachedUi.rotation.z = this.rotation.z;
   }
 
   testFriendlyOrFoe(): boolean {

@@ -14,12 +14,6 @@ export default class ContactManager {
   }
 
   init() {
-    this.core.scene.onBeforeRenderObservable.add(() => {this.updateAlyContact()})
-  }
-
-  updateAlyContact() {
-    this.core.units.forEach((value) => {
-      value.syncAttchedUi();
-    })
+    //
   }
 }

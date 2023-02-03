@@ -6,7 +6,7 @@ import IrstDTO from "./IRSTDTO";
 export default class Irst extends Sensor {
   irstDTO: IrstDTO;
 
-  constructor(irstDTO: IrstDTO, parent: Unit, scene: Scene) {
+  constructor(irstDTO: IrstDTO, parent: Unit) {
     super(parent);
 
     this.irstDTO = irstDTO;

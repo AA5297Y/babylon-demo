@@ -10,7 +10,7 @@ export default class Radar extends Sensor {
   alyUi: LinesMesh;
   foeUi: LinesMesh;
 
-  constructor(radarDTO: RadarDTO, parent: Unit, scene: Scene) {
+  constructor(radarDTO: RadarDTO, parent: Unit) {
     super(parent);
 
     this.radarDTO = radarDTO;
