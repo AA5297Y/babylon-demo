@@ -7,7 +7,7 @@ import Radar from "../../comps/sensors/radar/Radar";
 import RadarDTO from "../../comps/sensors/radar/RadarDTO";
 import AircraftDTO from "./AircraftDTO";
 import Unit from "../Unit";
- 
+
 export default class Aircraft extends Unit {
   aircraftDTO: AircraftDTO;
 
