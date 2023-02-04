@@ -17,15 +17,15 @@ export default {
       side: '0',
       position: new Vector3(-100, 0, 0),
       rotation: Vector3.Zero(),
+      sensors: [
+        {type: "radar", data: {range1m2: 45, angle: 90, esa: false, defaultRcs: 5, maxRcs: 50}}
+      ],
+      comms: [
+        {type: "comm", signal: 1, range: 100, data: {name: "HF", interval: 5}}
+      ],
+      turnAroundRate: 2,
+      turningRate: 4,
       data: {
-        sensors: [
-          {type: "radar", data: {range1m2: 45, angle: 90, esa: false, defaultRcs: 5, maxRcs: 50}}
-        ],
-        comms: [
-          {type: "comm", signal: 1, range: 100, data: {name: "HF", interval: 5}}
-        ],
-        turnAroundRate: 2,
-        turningRate: 4,
         climbRate: 100,
       }
     },
@@ -36,15 +36,15 @@ export default {
       side: '1',
       position: Vector3.Zero(),
       rotation: Vector3.Zero(),
+      sensors: [
+        {type: "radar", data: {range1m2: 60, angle: 120, esa: true, defaultRcs: 5, maxRcs: 50}}
+      ],
+      comms: [
+        {type: "comm", signal: 1, range: 100, data: {name: "HF", interval: 2}}
+      ],
+      turnAroundRate: 2,
+      turningRate: 4,
       data: {
-        sensors: [
-          {type: "radar", data: {range1m2: 60, angle: 120, esa: true, defaultRcs: 5, maxRcs: 50}}
-        ],
-        comms: [
-          {type: "comm", signal: 1, range: 100, data: {name: "HF", interval: 2}}
-        ],
-        turnAroundRate: 2,
-        turningRate: 4,
         climbRate: 100,
       }
     },
@@ -55,15 +55,15 @@ export default {
       side: '1',
       position: new Vector3(100, 0, 0),
       rotation: Vector3.Zero(),
+      sensors: [
+        {type: "radar", data: {range1m2: 120, angle: 120, esa: true, defaultRcs: 5, maxRcs: 50}}
+      ],
+      comms: [
+        {type: "comm", signal: 1, range: 150, data: {name: "HF", interval: 2}}
+      ],
+      turnAroundRate: 3,
+      turningRate: 5.5,
       data: {
-        sensors: [
-          {type: "radar", data: {range1m2: 120, angle: 120, esa: true, defaultRcs: 5, maxRcs: 50}}
-        ],
-        comms: [
-          {type: "comm", signal: 1, range: 150, data: {name: "HF", interval: 2}}
-        ],
-        turnAroundRate: 3,
-        turningRate: 5.5,
         climbRate: 100,
       }
     }

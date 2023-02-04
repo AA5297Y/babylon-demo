@@ -66,7 +66,7 @@ export default class Radar extends Sensor {
     
     this.alyUi = MeshBuilder.CreateLines("aly", line, this.parent.core.scene);
     this.alyUi.parent = this.parent.attachedUi;
-    this.foeUi = MeshBuilder.CreateDashedLines("foe", line, this.parent.core.scene);
+    this.foeUi = MeshBuilder.CreateDashedLines("foe", {...line, dashSize: 3, gapSize: 3, dashNb: 120}, this.parent.core.scene);
     this.foeUi.parent = this.parent.attachedUi;
   }
 

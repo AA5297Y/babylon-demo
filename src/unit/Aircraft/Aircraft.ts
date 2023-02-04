@@ -16,77 +16,13 @@ import CommDTO from "@/comps/comms/comm/CommDTO";
 export default class Aircraft extends Unit {
   type = "aircraft";
   aircraftDTO: AircraftDTO;
-
-  // sensors
-  sensors: Sensor[] = [];
-  // comms
-  comms: Comms[] = [];
-  lostComm: boolean = true;
-
-  // movement
-  target: Vector3 = null;
-  speedInKt: number = 480;
   
   constructor(unitDTO: UnitDTO, core: Core) {
     super(unitDTO, core);
     this.aircraftDTO = unitDTO.data;
-    this.core = core;
-
-    this.init();
   }
 
-  init():void {
-    this.initSensors();
-    this.initComms();
-    this.initMovement();
-  }
-
-  // sensor
-  initSensors(): void {
-    this.aircraftDTO.sensors.forEach((value) => {
-      switch (value.type) {
-        case "radar":
-          this.sensors.push(new Radar(<RadarDTO>value.data, this));
-          break;
-        case "irst":
-          this.sensors.push(new Irst(<IrstDTO>value.data, this))
-          break;
-      }
-    })
-  }
-
-  // comms
-  initComms() {
-    this.aircraftDTO.comms.forEach((value) => {
-      switch (value.type) {
-        case "comm":
-          this.comms.push(new Comm(<CommDTO>value.data, this));
-          break;
-      }
-    })
-
-    this.resetComm();
-
-    this.core.scene.onBeforeRenderObservable.add(() => {this.updateComm()})
-  }
-
-  resetComm() {
-    this.lostComm = true;
-
-    this.comms.forEach((value) => {
-      if (value.type == "comm" && value.available) {
-        this.lostComm = false;
-      }
-    })
-  }
-
-  updateComm() {
-    if (!this.lostComm) {
-      this.syncAttchedUi();
-    }
-  }
-
-  // movement
+  // override movement
   initMovement() {
     this.core.scene.onBeforeRenderObservable.add(() => {this.updateMovement()});
   }
@@ -111,7 +47,7 @@ export default class Aircraft extends Unit {
   }
 
   turnAround(): void {
-    const turnAroundAng = this.aircraftDTO.turnAroundRate * Math.PI / 180;
+    const turnAroundAng = this.unitDTO.turnAroundRate * Math.PI / 180;
     this.rotation.z += turnAroundAng / 1000 * this.getEngine().getDeltaTime();
   }
 
