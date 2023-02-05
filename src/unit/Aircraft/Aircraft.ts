@@ -1,17 +1,14 @@
-import { ActionManager, Scene, Vector3 } from "@babylonjs/core";
-import Sensor from "../../comps/sensors/Sensor";
-import SensorDTO from "../../comps/sensors/SensorDTO";
-import Irst from "../../comps/sensors/irst/Irst";
-import IrstDTO from "../../comps/sensors/irst/IrstDTO";
-import Radar from "../../comps/sensors/radar/Radar";
-import RadarDTO from "../../comps/sensors/radar/RadarDTO";
+import { ActionManager, GUID, Scene, Vector3 } from "@babylonjs/core";
 import AircraftDTO from "./AircraftDTO";
 import Unit from "../Unit";
 import Core from "@/core/Core";
 import UnitDTO from "../UnitDTO";
-import Comms from "@/comps/comms/Comms";
-import Comm from "@/comps/comms/comm/Comm";
-import CommDTO from "@/comps/comms/comm/CommDTO";
+import { Ellipse } from "@babylonjs/gui/2D/controls/ellipse";
+import { Line } from "@babylonjs/gui/2D/controls/line";
+import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
+import { Image } from "@babylonjs/gui/2D/controls/image";
+import SpriteTool from "@/core/SpriteTool";
+import Visibility from "../Visibility";
 
 export default class Aircraft extends Unit {
   type = "aircraft";
@@ -24,23 +21,25 @@ export default class Aircraft extends Unit {
 
   // override movement
   initMovement() {
-    this.core.scene.onBeforeRenderObservable.add(() => {this.updateMovement()});
-  }
-
-  updateMovement() {
-    if (this.target == null) {
-      this.turnAround();
-    } else {
-      this.turning();
+    this.updateMovement = () => {
+      if (this.target == null) {
+        this.turnAround();
+      } else {
+        this.turning();
+      }
+  
+      const forward = this.getForward();
+      let x = this.position.x + forward.x * this.getSpeed();
+      let y = this.position.y + forward.y * this.getSpeed();
+      let z = this.position.z + forward.z * this.getSpeed();
+  
+      this.position.set(x, y, z);
     }
 
-    const forward = this.getForward();
-    let x = this.position.x + forward.x * this.getSpeed();
-    let y = this.position.y + forward.y * this.getSpeed();
-    let z = this.position.z + forward.z * this.getSpeed();
-
-    this.position.set(x, y, z);
+    this.core.scene.onBeforeRenderObservable.add(this.updateMovement);
   }
+
+  updateMovement = (): void => {}
 
   turning(): void {
     //
@@ -58,5 +57,49 @@ export default class Aircraft extends Unit {
   getSpeed(): number {
     // 480kt
     return (this.speedInKt / 3600) / 1000 * this.getEngine().getDeltaTime();
+  }
+
+  // initUi
+  initUnitIcon() {
+    this.unitIcon = new Image("unitIcon");
+    SpriteTool.init(this.unitIcon);
+    SpriteTool.unknowAir(this.unitIcon);
+    this.core.fullScrGUI.addControl(this.unitIcon);
+    this.unitIcon.linkWithMesh(this.attachedUi);
+
+    this.updateUi = () => {
+      if (this.testFriendlyOrFoe()) {
+        this.unitIcon.isVisible = true;
+        SpriteTool.alyAir(this.unitIcon);
+      } else {
+        switch (this.visibility) {
+          case Visibility.invisible:
+            this.unitIcon.isVisible = false;
+            break;
+          case Visibility.unknow:
+            this.unitIcon.isVisible = true;
+            SpriteTool.unknowAir(this.unitIcon);
+            break;
+          case Visibility.friendly:
+            this.unitIcon.isVisible = true;
+            SpriteTool.friendlyAir(this.unitIcon);
+            break;
+          case Visibility.ally:
+            this.unitIcon.isVisible = true;
+            SpriteTool.alyAir(this.unitIcon);
+            break;
+          case Visibility.unfriendly:
+            this.unitIcon.isVisible = true;
+            SpriteTool.unFriendlyAir(this.unitIcon);
+            break;
+          case Visibility.enemy:
+            this.unitIcon.isVisible = true;
+            SpriteTool.enemeyAir(this.unitIcon);
+            break;
+        }
+      }
+    }
+
+    this.core.scene.onBeforeRenderObservable.add(this.updateUi);
   }
 }

@@ -8,11 +8,12 @@ import RadarDTO from "@/comps/sensors/radar/RadarDTO";
 import Sensor from "@/comps/sensors/Sensor";
 import Core from "@/core/Core";
 import { Scene, TransformNode, Vector3 } from "@babylonjs/core";
+import { Image } from "@babylonjs/gui/2D/controls/image";
 import UnitDTO from "./UnitDTO";
+import Visibility from "./Visibility";
 
 export default class Unit extends TransformNode {
   attachedUi: TransformNode = null;
-  attachedUiFixedRotation: TransformNode = null;
 
   callSign: string;
   type: string;
@@ -22,6 +23,7 @@ export default class Unit extends TransformNode {
 
   // sensors
   sensors: Sensor[] = [];
+
   // comms
   comms: Comms[] = [];
   lostComm: boolean = true;
@@ -29,6 +31,13 @@ export default class Unit extends TransformNode {
   // movement
   target: Vector3 = null;
   speedInKt: number = 480;
+
+  // icon
+  unitIcon: Image = null;
+
+  // visibility
+  visibility: Visibility = Visibility.unknow;
+  classified: boolean = false;
 
   constructor(unitDTO: UnitDTO, core: Core) {
     super(unitDTO.name, core.scene);
@@ -39,7 +48,6 @@ export default class Unit extends TransformNode {
     this.position = unitDTO.position;
 
     this.attachedUi = new TransformNode("attachedUi", this.core.scene);
-    this.attachedUiFixedRotation = new TransformNode("attachedUiFixedRotation", this.core.scene);
 
     this.init();
   }
@@ -48,6 +56,9 @@ export default class Unit extends TransformNode {
     this.initSensors();
     this.initComms();
     this.initMovement();
+    this.initUi();
+
+    this.syncAttchedUi();
   }
 
   syncAttchedUi() {
@@ -58,18 +69,8 @@ export default class Unit extends TransformNode {
     this.attachedUi.rotation.x = this.rotation.x;
     this.attachedUi.rotation.y = this.rotation.y;
     this.attachedUi.rotation.z = this.rotation.z;
-
-    // fixed rotation
-    this.attachedUiFixedRotation.position.x = this.position.x;
-    this.attachedUiFixedRotation.position.y = this.position.y;
-    this.attachedUiFixedRotation.position.z = this.position.z;
   }
 
-  testFriendlyOrFoe(): boolean {
-    return this.core.side == this.side;
-  }
-
-  
   // sensor
   initSensors(): void {
     this.unitDTO.sensors.forEach((value) => {
@@ -96,7 +97,13 @@ export default class Unit extends TransformNode {
 
     this.resetComm();
 
-    this.core.scene.onBeforeRenderObservable.add(() => {this.updateComm()})
+    this.updateComm = () => {
+      if (!this.lostComm && this.testFriendlyOrFoe()) {
+        this.syncAttchedUi();
+      }
+    }
+
+    this.core.scene.onBeforeRenderObservable.add(this.updateComm)
   }
 
   resetComm() {
@@ -109,14 +116,52 @@ export default class Unit extends TransformNode {
     })
   }
 
-  updateComm() {
-    if (!this.lostComm) {
-      this.syncAttchedUi();
-    }
-  }
+  updateComm = (): void => {}
 
   // movement
   initMovement() {
     // base class is static
   }
+
+  // initUi
+  initUi() {
+    this.initUnitIcon();
+  }
+
+  initUnitIcon() {
+    // 
+  }
+
+  updateUi = () => {}
+
+  // visibility
+  testFriendlyOrFoe(): boolean {
+    return this.core.side == this.side;
+  }
+
+  markInvisible() {
+    this.visibility = Visibility.invisible;
+  }
+
+  markUnknow() {
+    this.visibility = Visibility.unknow;
+  }
+
+  markFriendly() {
+    this.visibility = Visibility.friendly;
+  }
+
+  markAlly() {
+    this.visibility = Visibility.ally;
+  }
+
+  markUnfriendly() {
+    this.visibility = Visibility.unfriendly;
+  }
+
+  markEnemy() {
+    this.visibility = Visibility.enemy;
+  }
+
+
 }

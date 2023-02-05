@@ -1,6 +1,7 @@
 import NewScenario from "@/scenario/NewScenario";
 import Unit from "@/unit/Unit";
-import { ActionManager, Engine, Mesh, MeshBuilder, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
+import { ActionManager, Color3, Engine, Material, Mesh, MeshBuilder, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
+import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import CamController from "./CamController";
 import ContactManager from "./ContactManager";
 import InputManager from "./InputManager";
@@ -13,6 +14,7 @@ export default class Core {
   scene: Scene | undefined;
   // ground(raycast area)
   grid: Mesh;
+  fullScrGUI: AdvancedDynamicTexture;
 
   inputManager: InputManager;
   cameraControl: CamController;
@@ -35,6 +37,7 @@ export default class Core {
     this.scene.actionManager = new ActionManager();
 
     this.initGround();
+    this.initFullScrGUI();
 
     this.inputManager = new InputManager(this);
     this.cameraControl = new CamController(this);
@@ -53,6 +56,10 @@ export default class Core {
     this.grid = MeshBuilder.CreatePlane("ground", {width: 10000, height: 10000}, this.scene);
     this.grid.position = new Vector3(0, 0, 0.323974); // -600m
     this.grid.actionManager = new ActionManager(this.scene);
+
+    const gridMaterial = new StandardMaterial("grid");
+    gridMaterial.emissiveColor = Color3.FromHexString("#33334c");
+    this.grid.material = gridMaterial;
   }
 
   initRender() {
@@ -63,6 +70,11 @@ export default class Core {
     this.engine.runRenderLoop(() => {
         this.scene.render();
     });
+  }
+
+  // initFullScrGUI
+  initFullScrGUI() {
+    this.fullScrGUI = AdvancedDynamicTexture.CreateFullscreenUI("GUI layer");
   }
 
   // scenario read

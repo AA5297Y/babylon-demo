@@ -1,12 +1,11 @@
 const path = require('path');
-const fs = require('fs');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   entry: path.resolve(__dirname, 'src/Main.ts'),
   output: {
-    path: path.resolve(__dirname, 'fs'),
+    path: path.resolve(__dirname, 'output'),
     filename: 'js/Main.js'
   },
   resolve: {
@@ -27,6 +26,16 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/
       },
+      {
+        test: /\.(jpg|png|gif)$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: '[name]_[hash].[ext]',
+            outputPath: 'images/'
+          }
+        }
+      }
     ]
   },
   plugins: [

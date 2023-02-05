@@ -15,10 +15,10 @@ export default {
       callSign: "Tiger-0",
       name: "jf-17 block 2",
       side: '0',
-      position: new Vector3(-100, 0, 0),
+      position: new Vector3(-50, 0, 0),
       rotation: Vector3.Zero(),
       sensors: [
-        {type: "radar", data: {range1m2: 45, angle: 90, esa: false, defaultRcs: 5, maxRcs: 50}}
+        {type: "radar", data: {range1m2: 40, angle: 90, esa: false, defaultRcs: 5, maxRcs: 50}}
       ],
       comms: [
         {type: "comm", signal: 1, range: 100, data: {name: "HF", interval: 5}}

@@ -15,7 +15,7 @@ export default class Radar extends Sensor {
 
     this.radarDTO = radarDTO;
   
-    this.initUi();
+    this.init();
   }
 
   // compute
@@ -23,10 +23,19 @@ export default class Radar extends Sensor {
     return this.radarDTO.range1m2 * Math.pow(rcs, 1/4);
   }
 
-  initUi() {
+  init() {
     this.drawArc(this.radarDTO.defaultRcs);
 
-    this.parent.core.scene.onBeforeRenderObservable.add(() => {this.update()});
+    // update
+    this.update = (): void => {
+      if (this.parent.testFriendlyOrFoe()) {
+        this.updateAlyUi();
+      } else {
+        this.testUpdateFoeUi();
+      }
+    }
+
+    this.parent.core.scene.onBeforeRenderObservable.add(this.update);
   }
 
   // ui
@@ -66,17 +75,13 @@ export default class Radar extends Sensor {
     
     this.alyUi = MeshBuilder.CreateLines("aly", line, this.parent.core.scene);
     this.alyUi.parent = this.parent.attachedUi;
+    this.alyUi.edgesWidth = 1;
+    this.alyUi.outlineWidth = 0;
+
     this.foeUi = MeshBuilder.CreateDashedLines("foe", {...line, dashSize: 3, gapSize: 3, dashNb: 120}, this.parent.core.scene);
     this.foeUi.parent = this.parent.attachedUi;
-  }
-
-  // update
-  update(): void {
-    if (this.parent.testFriendlyOrFoe()) {
-      this.updateAlyUi();
-    } else {
-      this.testUpdateFoeUi();
-    }
+    this.foeUi.edgesWidth = 1;
+    this.foeUi.outlineWidth = 0;
   }
 
   // update aly ui
@@ -88,6 +93,11 @@ export default class Radar extends Sensor {
   // update foe ui
   testUpdateFoeUi() {
     this.alyUi.isVisible = false;
-    this.foeUi.isVisible = true;
+
+    if (this.parent.classified) {
+      this.foeUi.isVisible = true;
+    } else {
+      this.foeUi.isVisible = false;
+    }
   }
 }

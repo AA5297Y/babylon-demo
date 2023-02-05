@@ -22,38 +22,40 @@ export default class CamController {
   initCamControl() {
     this.camera.detachControl();
 
-    this.core.scene.onBeforeRenderObservable.add(() => this.updateCamera())
+    this.updateCamera = () => {
+      let x = this.camera.position.x;
+      let y = this.camera.position.y;
+      let z = this.camera.position.z;
+  
+      // key
+      if (this.core.inputManager.panScrShift.x == 0 && this.core.inputManager.panScrShift.y == 0 && this.core.inputManager.zoomShift == 0) {
+        x += (this.core.inputManager.x * this.core.inputManager.xMul);
+        y += (this.core.inputManager.y * this.core.inputManager.yMul);
+        z += (this.core.inputManager.z * this.core.inputManager.zMul);
+      } else {
+        x += (this.core.inputManager.panScrShift.x * 50);
+        y += (this.core.inputManager.panScrShift.y * 50);
+        z += (this.core.inputManager.zoomShift * 1500);
+  
+        this.core.inputManager.zoomShift = 0;
+      }
+  
+      if (z < -this.maxZ) {
+        z = -this.maxZ;
+      }
+      if (z > -this.minZ) {
+        z = -this.minZ;
+      }
+  
+      this.camera.position.set(x, y, z);
+  
+      this.ui();
+    }
+
+    this.core.scene.onBeforeRenderObservable.add(this.updateCamera)
   }
 
-  updateCamera() {
-    let x = this.camera.position.x;
-    let y = this.camera.position.y;
-    let z = this.camera.position.z;
-
-    // key
-    if (this.core.inputManager.panScrShift.x == 0 && this.core.inputManager.panScrShift.y == 0 && this.core.inputManager.zoomShift == 0) {
-      x += (this.core.inputManager.x * this.core.inputManager.xMul);
-      y += (this.core.inputManager.y * this.core.inputManager.yMul);
-      z += (this.core.inputManager.z * this.core.inputManager.zMul);
-    } else {
-      x += (this.core.inputManager.panScrShift.x * 50);
-      y += (this.core.inputManager.panScrShift.y * 50);
-      z += (this.core.inputManager.zoomShift * 1500);
-
-      this.core.inputManager.zoomShift = 0;
-    }
-
-    if (z < -this.maxZ) {
-      z = -this.maxZ;
-    }
-    if (z > -this.minZ) {
-      z = -this.minZ;
-    }
-
-    this.camera.position.set(x, y, z);
-
-    this.ui();
-  }
+  updateCamera  = () => {}
 
   ui() {
     const absX = Math.abs(this.core.inputManager.panScrShift.x);
