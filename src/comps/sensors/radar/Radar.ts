@@ -88,7 +88,7 @@ export default class Radar extends Sensor {
   updateAlyUi() {
     this.alyUi.isVisible = true;
     this.foeUi.isVisible = false;
-  }
+  } 
 
   // update foe ui
   testUpdateFoeUi() {
