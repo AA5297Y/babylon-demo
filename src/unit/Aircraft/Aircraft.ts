@@ -71,7 +71,7 @@ export default class Aircraft extends Unit {
       if (this.testFriendlyOrFoe()) {
         this.unitIcon.isVisible = true;
         SpriteTool.alyAir(this.unitIcon);
-      } else {
+      } else { 
         switch (this.visibility) {
           case Visibility.invisible:
             this.unitIcon.isVisible = false;
