@@ -8,7 +8,6 @@ export default interface UnitDTO {
   type: string;
   callSign: string;
   name: string;
-  side: string;
   sensors: SensorDTO[];
   comms: CommsDTO[];
   turningRate: number;

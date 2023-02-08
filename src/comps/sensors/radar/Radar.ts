@@ -1,6 +1,8 @@
+import Throttle from "@/core/tool/Throttle";
 import Unit from "@/unit/Unit";
 import { float, LinesMesh, Mesh, MeshBuilder, Scene, Vector2, Vector3 } from "@babylonjs/core";
 import Sensor from "../Sensor";
+import SensorDTO from "../SensorDTO";
 import RadarDTO from "./RadarDTO";
 
 export default class Radar extends Sensor {
@@ -10,10 +12,12 @@ export default class Radar extends Sensor {
   alyUi: LinesMesh;
   foeUi: LinesMesh;
 
-  constructor(radarDTO: RadarDTO, parent: Unit) {
-    super(parent);
+  enable = true;
 
-    this.radarDTO = radarDTO;
+  constructor(sensorDTO: SensorDTO, parent: Unit) {
+    super(sensorDTO, parent);
+
+    this.radarDTO = <RadarDTO>sensorDTO.data;
   
     this.init();
   }
@@ -28,10 +32,18 @@ export default class Radar extends Sensor {
 
     // update
     this.update = (): void => {
-      if (this.parent.testFriendlyOrFoe()) {
-        this.updateAlyUi();
+      if (!this.passive && this.enable) {
+        // ui update
+        if (this.parent.testFriendlyOrFoe()) {
+          this.updateAlyUi();
+        } else {
+          this.testUpdateFoeUi();
+        }
+
+        // scanning;
+        //Throttle(this.scaning(), this.refreshRate);
       } else {
-        this.testUpdateFoeUi();
+        this.disable();
       }
     }
 
@@ -99,5 +111,19 @@ export default class Radar extends Sensor {
     } else {
       this.foeUi.isVisible = false;
     }
+  }
+
+  // radar pass
+  disable() {
+    if (!this.alyUi.isVisible && !this.foeUi.isVisible) {
+      return;
+    }
+
+    this.alyUi.isVisible = false;
+    this.foeUi.isVisible = false;
+  }
+
+  scaning() {
+    console.log("radar: " + this.name);
   }
 }

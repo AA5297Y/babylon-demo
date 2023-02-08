@@ -2,12 +2,10 @@ import Comm from "@/comps/comms/comm/Comm";
 import CommDTO from "@/comps/comms/comm/CommDTO";
 import Comms from "@/comps/comms/Comms";
 import Irst from "@/comps/sensors/irst/Irst";
-import IrstDTO from "@/comps/sensors/Irst/IrstDTO";
 import Radar from "@/comps/sensors/radar/Radar";
-import RadarDTO from "@/comps/sensors/radar/RadarDTO";
 import Sensor from "@/comps/sensors/Sensor";
 import Core from "@/core/Core";
-import { Scene, TransformNode, Vector3 } from "@babylonjs/core";
+import { TransformNode, Vector3 } from "@babylonjs/core";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import UnitDTO from "./UnitDTO";
 import Visibility from "./Visibility";
@@ -19,7 +17,7 @@ export default class Unit extends TransformNode {
   type: string;
   unitDTO: UnitDTO;
   core: Core;
-  side: string;
+  sideId: number;
 
   // sensors
   sensors: Sensor[] = [];
@@ -36,15 +34,15 @@ export default class Unit extends TransformNode {
   unitIcon: Image = null;
 
   // visibility
-  visibility: Visibility = Visibility.unknow;
+  visibility: Visibility = Visibility.invisible;
   classified: boolean = false;
 
-  constructor(unitDTO: UnitDTO, core: Core) {
+  constructor(unitDTO: UnitDTO, core: Core, sideId: number) {
     super(unitDTO.name, core.scene);
     this.callSign = unitDTO.callSign;
     this.unitDTO = unitDTO;
     this.core = core;
-    this.side = unitDTO.side;
+    this.sideId = sideId;
     this.position = unitDTO.position;
 
     this.attachedUi = new TransformNode("attachedUi", this.core.scene);
@@ -76,10 +74,10 @@ export default class Unit extends TransformNode {
     this.unitDTO.sensors.forEach((value) => {
       switch (value.type) {
         case "radar":
-          this.sensors.push(new Radar(<RadarDTO>value.data, this));
+          this.sensors.push(new Radar(value, this));
           break;
         case "irst":
-          this.sensors.push(new Irst(<IrstDTO>value.data, this))
+          this.sensors.push(new Irst(value, this))
           break;
       }
     })
@@ -136,7 +134,7 @@ export default class Unit extends TransformNode {
 
   // visibility
   testFriendlyOrFoe(): boolean {
-    return this.core.side == this.side;
+    return this.core.side == this.sideId;
   }
 
   markInvisible() {

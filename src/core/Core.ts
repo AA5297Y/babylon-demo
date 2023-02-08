@@ -6,6 +6,7 @@ import CamController from "./CamController";
 import ContactManager from "./ContactManager";
 import InputManager from "./InputManager";
 import ScenarioReader from "./ScenarioReader";
+import Side from "./side/Side";
 
 // define game loop
 export default class Core {
@@ -15,6 +16,7 @@ export default class Core {
   // ground(raycast area)
   grid: Mesh;
   fullScrGUI: AdvancedDynamicTexture;
+  side: number;
 
   inputManager: InputManager;
   cameraControl: CamController;
@@ -22,8 +24,7 @@ export default class Core {
 
   // scenario data
   scenarioReader: ScenarioReader = null;
-  units: Unit[] = [];
-  side = '0';
+  sides: Side[] = [];
 
   constructor(canvas: HTMLCanvasElement, engine: Engine) {
     this.canvas = canvas;

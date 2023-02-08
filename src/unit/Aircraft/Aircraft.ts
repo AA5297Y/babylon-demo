@@ -1,21 +1,18 @@
-import { ActionManager, GUID, Scene, Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core";
 import AircraftDTO from "./AircraftDTO";
 import Unit from "../Unit";
 import Core from "@/core/Core";
 import UnitDTO from "../UnitDTO";
-import { Ellipse } from "@babylonjs/gui/2D/controls/ellipse";
-import { Line } from "@babylonjs/gui/2D/controls/line";
-import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Image } from "@babylonjs/gui/2D/controls/image";
-import SpriteTool from "@/core/SpriteTool";
+import SpriteTool from "@/core/tool/SpriteTool";
 import Visibility from "../Visibility";
 
 export default class Aircraft extends Unit {
   type = "aircraft";
   aircraftDTO: AircraftDTO;
   
-  constructor(unitDTO: UnitDTO, core: Core) {
-    super(unitDTO, core);
+  constructor(unitDTO: UnitDTO, core: Core, sideId: number) {
+    super(unitDTO, core, sideId);
     this.aircraftDTO = unitDTO.data;
   }
 
