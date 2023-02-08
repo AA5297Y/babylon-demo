@@ -58,7 +58,7 @@ export default {
           type: 'aircraft',
           callSign: "Tiger-2",
           name: "j-20",
-          position: new Vector3(100, 0, 0),
+          position: new Vector3(50, 0, 0),
           rotation: Vector3.Zero(),
           sensors: [
             {type: "radar", name: 'J-20 AESA', passive: false, refreshRate: 2, data: {range1m2: 120, angle: 120, esa: true, defaultRcs: 5, maxRcs: 50}}

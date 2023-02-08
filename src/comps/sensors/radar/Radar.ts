@@ -1,6 +1,6 @@
 import Throttle from "@/core/tool/Throttle";
 import Unit from "@/unit/Unit";
-import { float, LinesMesh, Mesh, MeshBuilder, Scene, Vector2, Vector3 } from "@babylonjs/core";
+import { float, LinesMesh, Mesh, MeshBuilder, Quaternion, Scene, Vector2, Vector3 } from "@babylonjs/core";
 import Sensor from "../Sensor";
 import SensorDTO from "../SensorDTO";
 import RadarDTO from "./RadarDTO";
@@ -12,7 +12,10 @@ export default class Radar extends Sensor {
   alyUi: LinesMesh;
   foeUi: LinesMesh;
 
+  // update
   enable = true;
+  range5m2: number;
+  guardRange: number;
 
   constructor(sensorDTO: SensorDTO, parent: Unit) {
     super(sensorDTO, parent);
@@ -28,8 +31,11 @@ export default class Radar extends Sensor {
   }
 
   init() {
+    this.range5m2 = this.rcs2Range(5);
+    this.guardRange = this.rcs2Range(this.radarDTO.maxRcs);
     this.drawArc(this.radarDTO.defaultRcs);
 
+    const throttledScaning = Throttle(this.scaning, this.refreshRate);
     // update
     this.update = (): void => {
       if (!this.passive && this.enable) {
@@ -41,7 +47,7 @@ export default class Radar extends Sensor {
         }
 
         // scanning;
-        Throttle(this.scaning(), this.refreshRate);
+        throttledScaning(this);
       } else {
         this.disable();
       }
@@ -124,6 +130,32 @@ export default class Radar extends Sensor {
   }
 
   scaning() {
-    console.log("radar: " + this.name);
+    this.parent.core.sides.forEach((value) => {
+      if (value.id != this.parent.core.side) {
+        value.units.forEach((other) => {
+          this.mesure(other);
+        })
+      }
+    })
+  }
+  
+  mesure(other: Unit) {
+    const distance = Vector3.Distance(this.parent.position, other.position);
+    if (distance > this.guardRange) {
+      return;
+    }
+
+    const angle = Vector3.GetAngleBetweenVectors(
+      this.parent.up,
+      other.position.subtract(this.parent.position),
+      this.parent.forward.negate()
+    ) / (Math.PI / 180);
+
+    if (Math.abs(angle) < (this.radarDTO.angle / 2)) {
+      if (this.parent.testFriendlyOrFoe()) {
+        other.markUnknow();
+        other.syncAttchedUi();
+      }
+    }
   }
 }

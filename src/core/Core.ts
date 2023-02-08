@@ -82,8 +82,4 @@ export default class Core {
   testScenarioReader() {
     this.scenarioReader = new ScenarioReader(this, NewScenario);
   }
-
-  update(): void {
-    //
-  }
 }

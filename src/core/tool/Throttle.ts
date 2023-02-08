@@ -1,13 +1,14 @@
 export default (func, timeInSec) => {
   let timeout = null;
-  return () => {
-    if (timeout) {
+  
+  return (that, ...args) => {
+    if (timeout != null) {
       return;
     }
 
     timeout = setTimeout(() => {
-      func.call(this);
       timeout = null;
+      func.call(that, ...args);
     }, timeInSec * 1000);
   }
 }
