@@ -41,7 +41,7 @@ export default class Radar extends Sensor {
         }
 
         // scanning;
-        //Throttle(this.scaning(), this.refreshRate);
+        Throttle(this.scaning(), this.refreshRate);
       } else {
         this.disable();
       }
