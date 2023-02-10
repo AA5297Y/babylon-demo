@@ -17,6 +17,8 @@ export default class Radar extends Sensor {
   range5m2: number;
   guardRange: number;
 
+  targetList: Unit[];
+
   constructor(sensorDTO: SensorDTO, parent: Unit) {
     super(sensorDTO, parent);
 
@@ -132,25 +134,40 @@ export default class Radar extends Sensor {
   }
 
   scaning() {
+    this.targetList = [];
+
     this.parent.core.sides.forEach((value) => {
-      if (value.id != this.parent.core.side) {
-        value.units.forEach((other) => {
-          this.mesure(other);
-        })
+      if (value.id == this.parent.core.side) {
+        return;
       }
+
+      value.units.forEach((other) => {
+        if (this.mesure(other)) {
+          this.targetList.push(other);
+        }
+      })
     })
   }
   
-  mesure(other: Unit) {
+  mesure(other: Unit): boolean {
     const distance = Vector3.Distance(this.parent.position, other.position);
     if (distance > this.guardRange) {
-      return;
+      return false;
     }
 
     const angle = this.getBearing(other);
+    const absAngle = Math.abs(angle);
 
-    if (Math.abs(angle) < (this.radarDTO.angle / 2)) {
-      const rcs = this.getTargetRCS(other);
+    if (absAngle > (this.radarDTO.angle / 2)) {
+      return false;
+    }
+
+    const rcs = other.getRCSFrom(this.parent);
+
+    const range = this.rcs2Range(rcs, absAngle);
+
+    if (range < distance) {
+      return true;
     }
   }
 
@@ -160,9 +177,5 @@ export default class Radar extends Sensor {
       other.position.subtract(this.parent.position),
       this.parent.forward.negate()
     ) / (Math.PI / 180);
-  }
-
-  getTargetRCS(other: Unit): number {
-    return other.getRCSFrom(this.parent);
   }
 }

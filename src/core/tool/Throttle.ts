@@ -7,8 +7,12 @@ export default (func, timeInSec) => {
     }
 
     timeout = setTimeout(() => {
+      clearTimeout(timeout)
       timeout = null;
-      func.call(that, ...args);
+
+      if (that) {
+        func.call(that, ...args);
+      }
     }, timeInSec * 1000);
   }
 }

@@ -1,4 +1,4 @@
-import { Camera, Engine, Scene, Vector3 } from "@babylonjs/core";
+import { Camera, Engine, Scene, Vector3, WebGPUEngine } from "@babylonjs/core";
 import Core from "./core/Core";
 import '@babylonjs/inspector';
 
@@ -13,7 +13,13 @@ class Main {
     
     containerDiv.append(canvas);
 
-    const engine = new Engine(canvas, true);
+    this.initEngine(canvas);
+  }
+
+  async initEngine(canvas: HTMLCanvasElement) {
+    const engine = new WebGPUEngine(canvas);
+    await engine.initAsync();
+
     const core = new Core(canvas, engine);
         
     window.addEventListener('resize', () => {

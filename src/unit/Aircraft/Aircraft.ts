@@ -6,13 +6,14 @@ import UnitDTO from "../UnitDTO";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import SpriteTool from "@/core/tool/SpriteTool";
 import Visibility from "../Visibility";
+import Side from "@/core/side/Side";
 
 export default class Aircraft extends Unit {
   type = "aircraft";
   aircraftDTO: AircraftDTO;
   
-  constructor(unitDTO: UnitDTO, core: Core, sideId: number) {
-    super(unitDTO, core, sideId);
+  constructor(unitDTO: UnitDTO, core: Core, side: Side) {
+    super(unitDTO, core, side);
     this.aircraftDTO = unitDTO.data;
   }
 
@@ -65,35 +66,30 @@ export default class Aircraft extends Unit {
     this.unitIcon.linkWithMesh(this.attachedUi);
 
     this.updateUi = () => {
-      if (this.testFriendlyOrFoe()) {
-        this.unitIcon.isVisible = true;
-        SpriteTool.alyAir(this.unitIcon);
-      } else { 
-        switch (this.visibility) {
-          case Visibility.invisible:
-            this.unitIcon.isVisible = false;
-            break;
-          case Visibility.unknow:
-            this.unitIcon.isVisible = true;
-            SpriteTool.unknowAir(this.unitIcon);
-            break;
-          case Visibility.friendly:
-            this.unitIcon.isVisible = true;
-            SpriteTool.friendlyAir(this.unitIcon);
-            break;
-          case Visibility.ally:
-            this.unitIcon.isVisible = true;
-            SpriteTool.alyAir(this.unitIcon);
-            break;
-          case Visibility.unfriendly:
-            this.unitIcon.isVisible = true;
-            SpriteTool.unFriendlyAir(this.unitIcon);
-            break;
-          case Visibility.enemy:
-            this.unitIcon.isVisible = true;
-            SpriteTool.enemeyAir(this.unitIcon);
-            break;
-        }
+      switch (this.visibility) {
+        case Visibility.invisible:
+          this.unitIcon.isVisible = false;
+          break;
+        case Visibility.unknow:
+          this.unitIcon.isVisible = true;
+          SpriteTool.unknowAir(this.unitIcon);
+          break;
+        case Visibility.friendly:
+          this.unitIcon.isVisible = true;
+          SpriteTool.friendlyAir(this.unitIcon);
+          break;
+        case Visibility.ally:
+          this.unitIcon.isVisible = true;
+          SpriteTool.alyAir(this.unitIcon);
+          break;
+        case Visibility.unfriendly:
+          this.unitIcon.isVisible = true;
+          SpriteTool.unFriendlyAir(this.unitIcon);
+          break;
+        case Visibility.enemy:
+          this.unitIcon.isVisible = true;
+          SpriteTool.enemeyAir(this.unitIcon);
+          break;
       }
     }
 

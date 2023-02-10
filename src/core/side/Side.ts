@@ -1,5 +1,4 @@
 import Aircraft from "@/unit/Aircraft/Aircraft";
-import AircraftDTO from "@/unit/Aircraft/AircraftDTO";
 import Unit from "@/unit/Unit";
 import Core from "../Core";
 import SideDTO from "./SideDTO";
@@ -26,7 +25,7 @@ export default class Side {
     this.sideDTO.units.forEach((value) => {
       switch (value.type) {
         case "aircraft":
-          this.units.push(new Aircraft(value, this.core, this.id))
+          this.units.push(new Aircraft(value, this.core, this))
           break;
       }
     })

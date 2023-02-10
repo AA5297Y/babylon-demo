@@ -9,8 +9,11 @@ import Signal from "@/comps/signals/Signal";
 import SignalDTO from "@/comps/signals/SignalDTO";
 import Visual from "@/comps/signals/visual/Visual";
 import Core from "@/core/Core";
+import Side from "@/core/side/Side";
 import { TransformNode, Vector3 } from "@babylonjs/core";
+import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Image } from "@babylonjs/gui/2D/controls/image";
+import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
 import UnitDTO from "./UnitDTO";
 import Visibility from "./Visibility";
 
@@ -21,10 +24,11 @@ export default class Unit extends TransformNode {
   type: string;
   unitDTO: UnitDTO;
   core: Core;
-  sideId: number;
+  side: Side;
 
   // sensors
   sensors: Sensor[] = [];
+  spotedTargets: Unit[];
 
   // comms
   comms: Comms[] = [];
@@ -45,13 +49,17 @@ export default class Unit extends TransformNode {
   // visibility
   visibility: Visibility = Visibility.invisible;
   classified: boolean = false;
+  LTBDCounter: TextBlock;
+  LTBDCUpdated: boolean = false;
+  LTBDC: number = 0;
+  LTBDCTimeInterval: NodeJS.Timeout;
 
-  constructor(unitDTO: UnitDTO, core: Core, sideId: number) {
+  constructor(unitDTO: UnitDTO, core: Core, side: Side) {
     super(unitDTO.name, core.scene);
     this.callSign = unitDTO.callSign;
     this.unitDTO = unitDTO;
     this.core = core;
-    this.sideId = sideId;
+    this.side = side;
     this.position = unitDTO.position;
 
     this.attachedUi = new TransformNode("attachedUi", this.core.scene);
@@ -67,16 +75,6 @@ export default class Unit extends TransformNode {
     this.initUi();
 
     this.syncAttchedUi();
-  }
-
-  syncAttchedUi() {
-    this.attachedUi.position.x = this.position.x;
-    this.attachedUi.position.y = this.position.y;
-    this.attachedUi.position.z = this.position.z;
-
-    this.attachedUi.rotation.x = this.rotation.x;
-    this.attachedUi.rotation.y = this.rotation.y;
-    this.attachedUi.rotation.z = this.rotation.z;
   }
 
   // sensor
@@ -107,6 +105,7 @@ export default class Unit extends TransformNode {
 
     this.updateComm = () => {
       if (!this.lostComm && this.testFriendlyOrFoe()) {
+        this.visibility = Visibility.ally;
         this.syncAttchedUi();
       }
     }
@@ -185,6 +184,7 @@ export default class Unit extends TransformNode {
   // initUi
   initUi() {
     this.initUnitIcon();
+    this.initLastTimeBeenDetectedCounter();
   }
 
   initUnitIcon() {
@@ -195,7 +195,7 @@ export default class Unit extends TransformNode {
 
   // visibility
   testFriendlyOrFoe(): boolean {
-    return this.core.side == this.sideId;
+    return this.core.side == this.side.id;
   }
 
   markInvisible() {
@@ -222,5 +222,45 @@ export default class Unit extends TransformNode {
     this.visibility = Visibility.enemy;
   }
 
+  initLastTimeBeenDetectedCounter() {
+    this.LTBDCounter = new TextBlock("LTBD");
+    this.LTBDCounter.height = "12px";
+    this.LTBDCounter.fontSize = "12px";
+    this.LTBDCounter.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+    this.LTBDCounter.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    this.LTBDCounter.color = "white";
 
+    this.core.fullScrGUI.addControl(this.LTBDCounter);
+    this.LTBDCounter.linkOffsetY = 18;
+    this.LTBDCounter.linkWithMesh(this.attachedUi);
+
+    this.LTBDCounter.isVisible = false;
+  }
+
+  lastTimeBeenDetectedTimer() {
+    if (this.LTBDCUpdated) {
+      this.LTBDCUpdated = false;
+      clearTimeout(this.LTBDCTimeInterval);
+      this.LTBDC = 0;
+      this.lastTimeBeenDetectedTimer();
+      return;
+    }
+
+    this.LTBDC++;
+    this.LTBDCounter.text = this.LTBDC + "s";
+
+    this.LTBDCTimeInterval = setTimeout(() => {
+      this.lastTimeBeenDetectedTimer();
+    }, 1000)
+  }
+
+  syncAttchedUi() {
+    this.attachedUi.position.x = this.position.x;
+    this.attachedUi.position.y = this.position.y;
+    this.attachedUi.position.z = this.position.z;
+
+    this.attachedUi.rotation.x = this.rotation.x;
+    this.attachedUi.rotation.y = this.rotation.y;
+    this.attachedUi.rotation.z = this.rotation.z;
+  }
 }
