@@ -25,6 +25,9 @@ export default {
           comms: [
             {type: "comm", name: "HF Radio", signal: 1, range: 100, data: {interval: 5}}
           ],
+          signals: [
+            {type: "rcs", forward: 4.0, side: 6.2, rear: 4.8}
+          ],
           turnAroundRate: 2,
           turningRate: 4,
           data: {
@@ -48,6 +51,9 @@ export default {
           comms: [
             {type: "comm", name: "HF Radio", signal: 1, range: 100, data: {name: "HF", interval: 2}}
           ],
+          signals: [
+            {type: "rcs", forward: 3.6, side: 6.0, rear: 4.6}
+          ],
           turnAroundRate: 2,
           turningRate: 4,
           data: {
@@ -65,6 +71,9 @@ export default {
           ],
           comms: [
             {type: "comm", name: "HF Radio", signal: 1, range: 150, data: {name: "HF", interval: 2}}
+          ],
+          signals: [
+            {type: "rcs", forward: 0.005, side: 0.5, rear: 0.02}
           ],
           turnAroundRate: 3,
           turningRate: 5.5,

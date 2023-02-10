@@ -4,6 +4,10 @@ import Comms from "@/comps/comms/Comms";
 import Irst from "@/comps/sensors/irst/Irst";
 import Radar from "@/comps/sensors/radar/Radar";
 import Sensor from "@/comps/sensors/Sensor";
+import RCS from "@/comps/signals/rcs/RCS";
+import Signal from "@/comps/signals/Signal";
+import SignalDTO from "@/comps/signals/SignalDTO";
+import Visual from "@/comps/signals/visual/Visual";
 import Core from "@/core/Core";
 import { TransformNode, Vector3 } from "@babylonjs/core";
 import { Image } from "@babylonjs/gui/2D/controls/image";
@@ -25,6 +29,11 @@ export default class Unit extends TransformNode {
   // comms
   comms: Comms[] = [];
   lostComm: boolean = true;
+
+  // signals
+  signals: Signal[] = [];
+  visual: SignalDTO = {type: '', forward: 0.0, side: 0.0, rear: 0.0};
+  rcs: SignalDTO = {type: '', forward: 0.0, side: 0.0, rear: 0.0};
 
   // movement
   target: Vector3 = null;
@@ -53,6 +62,7 @@ export default class Unit extends TransformNode {
   init():void {
     this.initSensors();
     this.initComms();
+    this.initSignal();
     this.initMovement();
     this.initUi();
 
@@ -116,9 +126,60 @@ export default class Unit extends TransformNode {
 
   updateComm = (): void => {}
 
+  // Signal
+  initSignal() {
+    this.unitDTO.signals.forEach((value) => {
+      switch (value.type) {
+        case "rcs":
+          this.signals.push(new Signal(<RCS>value));
+          break;
+        case "visual":
+          this.signals.push(new Signal(<Visual>value));
+          break;
+      }
+    })
+
+    this.updateRcs();
+    this.updateVisual();
+  }
+
+  updateRcs() {
+    this.unitDTO.signals.forEach((value) => {
+      if (value.type == "rcs") {
+        this.rcs.forward = value.forward;
+        this.rcs.side = value.side;
+        this.rcs.rear = value.rear;
+      }
+    })
+  }
+
+  updateVisual() {
+
+  }
+  
+  getRCSFrom(other: Unit): number {
+    const absAngle = Math.abs(this.getTargetBearing(other));
+
+    if (absAngle >= 120) {
+      return this.rcs.rear;
+    } else if (absAngle >= 60) {
+      return this.rcs.side;
+    } else {
+      return this.rcs.forward;
+    }
+  }
+
   // movement
   initMovement() {
     // base class is static
+  }
+
+  getTargetBearing(other: Unit) {
+    return Vector3.GetAngleBetweenVectors(
+      this.up,
+      other.position.subtract(this.position),
+      this.forward.negate()
+    ) / (Math.PI / 180);
   }
 
   // initUi

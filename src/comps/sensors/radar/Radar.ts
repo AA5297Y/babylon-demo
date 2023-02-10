@@ -26,8 +26,10 @@ export default class Radar extends Sensor {
   }
 
   // compute
-  rcs2Range(rcs: float): float {
-    return this.radarDTO.range1m2 * Math.pow(rcs, 1/4);
+  rcs2Range(rcs: float, angle: number = 0): float {
+    return this.radarDTO.esa ? 
+    (this.radarDTO.range1m2 * Math.pow(rcs, 1/4) * Math.cos(angle)) :
+    (this.radarDTO.range1m2 * Math.pow(rcs, 1/4));
   }
 
   init() {
@@ -145,17 +147,22 @@ export default class Radar extends Sensor {
       return;
     }
 
-    const angle = Vector3.GetAngleBetweenVectors(
+    const angle = this.getBearing(other);
+
+    if (Math.abs(angle) < (this.radarDTO.angle / 2)) {
+      const rcs = this.getTargetRCS(other);
+    }
+  }
+
+  getBearing(other: Unit) {
+    return Vector3.GetAngleBetweenVectors(
       this.parent.up,
       other.position.subtract(this.parent.position),
       this.parent.forward.negate()
     ) / (Math.PI / 180);
+  }
 
-    if (Math.abs(angle) < (this.radarDTO.angle / 2)) {
-      if (this.parent.testFriendlyOrFoe()) {
-        other.markUnknow();
-        other.syncAttchedUi();
-      }
-    }
+  getTargetRCS(other: Unit): number {
+    return other.getRCSFrom(this.parent);
   }
 }
