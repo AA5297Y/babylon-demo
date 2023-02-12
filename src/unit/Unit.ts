@@ -1,6 +1,8 @@
 import Comm from "@/comps/comms/comm/Comm";
 import CommDTO from "@/comps/comms/comm/CommDTO";
 import Comms from "@/comps/comms/Comms";
+import JetEngine from "@/comps/propulsions/jetEngine/JetEngine";
+import Propulsion from "@/comps/propulsions/Propulsion";
 import Irst from "@/comps/sensors/irst/Irst";
 import Radar from "@/comps/sensors/radar/Radar";
 import Sensor from "@/comps/sensors/Sensor";
@@ -40,6 +42,7 @@ export default class Unit extends TransformNode {
   rcs: SignalDTO = {type: '', forward: 0.0, side: 0.0, rear: 0.0};
 
   // movement
+  propulsions: Propulsion[] = [];
   target: Vector3 = null;
   speedInKt: number = 480;
 
@@ -70,7 +73,8 @@ export default class Unit extends TransformNode {
   init():void {
     this.initSensors();
     this.initComms();
-    this.initSignal();
+    this.initSignals();
+    this.initProPulsions();
     this.initMovement();
     this.initUi();
 
@@ -126,14 +130,14 @@ export default class Unit extends TransformNode {
   updateComm = (): void => {}
 
   // Signal
-  initSignal() {
+  initSignals() {
     this.unitDTO.signals.forEach((value) => {
       switch (value.type) {
         case "rcs":
-          this.signals.push(new Signal(<RCS>value));
+          this.signals.push(new Signal(value));
           break;
         case "visual":
-          this.signals.push(new Signal(<Visual>value));
+          this.signals.push(new Signal(value));
           break;
       }
     })
@@ -169,6 +173,16 @@ export default class Unit extends TransformNode {
   }
 
   // movement
+  initProPulsions() {
+    this.unitDTO.propulsions.forEach((value) => {
+      switch (value.type) {
+        case "jetEngine":
+          this.propulsions.push(new JetEngine())
+          break;
+      }
+    })
+  }
+  
   initMovement() {
     // base class is static
   }
@@ -224,9 +238,10 @@ export default class Unit extends TransformNode {
 
   initLastTimeBeenDetectedCounter() {
     this.LTBDCounter = new TextBlock("LTBD");
+    this.LTBDCounter.width = "24px";
     this.LTBDCounter.height = "12px";
     this.LTBDCounter.fontSize = "12px";
-    this.LTBDCounter.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+    this.LTBDCounter.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
     this.LTBDCounter.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
     this.LTBDCounter.color = "white";
 
@@ -235,6 +250,8 @@ export default class Unit extends TransformNode {
     this.LTBDCounter.linkWithMesh(this.attachedUi);
 
     this.LTBDCounter.isVisible = false;
+
+    this.lastTimeBeenDetectedTimer();
   }
 
   lastTimeBeenDetectedTimer() {
@@ -251,7 +268,13 @@ export default class Unit extends TransformNode {
 
     this.LTBDCTimeInterval = setTimeout(() => {
       this.lastTimeBeenDetectedTimer();
-    }, 1000)
+    }, 1000);
+  }
+
+  beenDetected() {
+    this.LTBDCUpdated = true;
+    this.LTBDCounter.isVisible = true;
+    this.syncAttchedUi();
   }
 
   syncAttchedUi() {
