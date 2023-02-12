@@ -1,4 +1,5 @@
 import CommsDTO from "@/comps/comms/CommsDTO";
+import PropulsionDTO from "@/comps/propulsions/PropulsionDTO";
 import SensorDTO from "@/comps/sensors/SensorDTO";
 import SignalDTO from "@/comps/signals/SignalDTO";
 import { Vector3 } from "@babylonjs/core";
@@ -12,6 +13,7 @@ export default interface UnitDTO {
   sensors: SensorDTO[];
   comms: CommsDTO[];
   signals: SignalDTO[]
+  propulsions: PropulsionDTO[];
   turningRate: number;
   turnAroundRate: number;
   position: Vector3;

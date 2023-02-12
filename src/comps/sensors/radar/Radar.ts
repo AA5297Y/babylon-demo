@@ -166,7 +166,12 @@ export default class Radar extends Sensor {
 
     const range = this.rcs2Range(rcs, absAngle);
 
-    if (range < distance) {
+    if (distance < range) {
+      if (this.parent.testFriendlyOrFoe()) {
+        other.markUnknow();
+        other.beenDetected();
+      }
+
       return true;
     }
   }
