@@ -2,17 +2,17 @@ import { Vector3 } from "@babylonjs/core";
 import AircraftDTO from "./AircraftDTO";
 import Unit from "../Unit";
 import Core from "@/core/Core";
-import UnitDTO from "../UnitDTO";
+import * as UnitDTO from "../UnitDTO";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import SpriteTool from "@/core/tool/SpriteTool";
 import Visibility from "../Visibility";
 import Side from "@/core/side/Side";
 
 export default class Aircraft extends Unit {
-  type = "aircraft";
+  type = UnitDTO.TYPE.aircraft;
   aircraftDTO: AircraftDTO;
   
-  constructor(unitDTO: UnitDTO, core: Core, side: Side) {
+  constructor(unitDTO: UnitDTO.UnitDTO, core: Core, side: Side) {
     super(unitDTO, core, side);
     this.aircraftDTO = unitDTO.data;
   }
@@ -27,9 +27,11 @@ export default class Aircraft extends Unit {
       }
   
       const forward = this.getForward();
-      let x = this.position.x + forward.x * this.getSpeed();
-      let y = this.position.y + forward.y * this.getSpeed();
-      let z = this.position.z + forward.z * this.getSpeed();
+      const speed = this.getSpeed();
+
+      let x = this.position.x + forward.x * speed;
+      let y = this.position.y + forward.y * speed;
+      let z = this.position.z + forward.z * speed;
   
       this.position.set(x, y, z);
     }
@@ -53,8 +55,19 @@ export default class Aircraft extends Unit {
   }
 
   getSpeed(): number {
-    // 480kt
-    return (this.speedInKt / 3600) / 1000 * this.getEngine().getDeltaTime();
+    let speed = 0;
+    this.propulsions.forEach((value) => {
+      if (value.enable) {
+        this.logger.text = "speed: " + value.speed + "\n" +
+        "altitude: " + value.altitude + "\n" + 
+        "fuelCons: " + value.fuelConsumption;
+
+        speed = (value.speed / 3600) / 1000 * this.getEngine().getDeltaTime();
+        return;
+      }
+    });
+
+    return speed;
   }
 
   // initUi

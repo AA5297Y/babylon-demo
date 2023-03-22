@@ -13,11 +13,16 @@ export default class Core {
   canvas: HTMLCanvasElement;
   engine: Engine;
   scene: Scene | undefined;
+
   // ground(raycast area)
   grid: Mesh;
   fullScrGUI: AdvancedDynamicTexture;
   side: number;
 
+  // log mode
+  logMode: boolean = true;
+
+  // managers
   inputManager: InputManager;
   cameraControl: CamController;
   contactManager: ContactManager;

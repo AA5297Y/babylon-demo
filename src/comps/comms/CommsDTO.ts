@@ -1,10 +1,15 @@
-import { float } from "@babylonjs/core";
 import CommDTO from "./comm/CommDTO";
 
-export default interface CommsDTO {
+interface CommsDTO {
   type: String;
   name: String;
   signal: number;
   range: number;
   data: CommDTO;
 }
+
+enum TYPE {
+  comm = "comm",
+}
+
+export { CommsDTO, TYPE };

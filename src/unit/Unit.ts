@@ -1,30 +1,34 @@
 import Comm from "@/comps/comms/comm/Comm";
 import CommDTO from "@/comps/comms/comm/CommDTO";
 import Comms from "@/comps/comms/Comms";
+import * as CommsDTO from "@/comps/comms/CommsDTO";
+import AviationFuelTank from "@/comps/fuelTank/airFuelTank/AviationFuelTank";
+import FuelTank from "@/comps/fuelTank/FuelTank";
+import * as FuelTankDTO from "@/comps/fuelTank/FuelTankDTO";
 import JetEngine from "@/comps/propulsions/jetEngine/JetEngine";
 import Propulsion from "@/comps/propulsions/Propulsion";
+import * as PropulsionDTO from "@/comps/propulsions/PropulsionDTO";
 import Irst from "@/comps/sensors/irst/Irst";
 import Radar from "@/comps/sensors/radar/Radar";
 import Sensor from "@/comps/sensors/Sensor";
-import RCS from "@/comps/signals/rcs/RCS";
+import * as SensorDTO from "@/comps/sensors/SensorDTO";
 import Signal from "@/comps/signals/Signal";
-import SignalDTO from "@/comps/signals/SignalDTO";
-import Visual from "@/comps/signals/visual/Visual";
+import { SignalDTO } from "@/comps/signals/SignalDTO";
 import Core from "@/core/Core";
 import Side from "@/core/side/Side";
 import { TransformNode, Vector3 } from "@babylonjs/core";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Image } from "@babylonjs/gui/2D/controls/image";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import UnitDTO from "./UnitDTO";
+import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
+import * as UnitDTO from "./UnitDTO";
 import Visibility from "./Visibility";
 
 export default class Unit extends TransformNode {
   attachedUi: TransformNode = null;
 
-  callSign: string;
-  type: string;
-  unitDTO: UnitDTO;
+  callSign: String;
+  type: UnitDTO.TYPE;
+  unitDTO: UnitDTO.UnitDTO;
   core: Core;
   side: Side;
 
@@ -41,10 +45,18 @@ export default class Unit extends TransformNode {
   visual: SignalDTO = {type: '', forward: 0.0, side: 0.0, rear: 0.0};
   rcs: SignalDTO = {type: '', forward: 0.0, side: 0.0, rear: 0.0};
 
-  // movement
+  // all type fuelTanks
+  fuelTanks: {
+    aviationFuel: FuelTank[],
+  } = {
+    aviationFuel: [],
+  };
+
+  // propulsions
   propulsions: Propulsion[] = [];
   target: Vector3 = null;
-  speedInKt: number = 480;
+  targetAltitude: number;
+  targetSpeed: number;
 
   // icon
   unitIcon: Image = null;
@@ -57,8 +69,11 @@ export default class Unit extends TransformNode {
   LTBDC: number = 0;
   LTBDCTimeInterval: NodeJS.Timeout;
 
-  constructor(unitDTO: UnitDTO, core: Core, side: Side) {
-    super(unitDTO.name, core.scene);
+  // logger
+  logger: TextBlock;
+
+  constructor(unitDTO: UnitDTO.UnitDTO, core: Core, side: Side) {
+    super(unitDTO.name.toString(), core.scene);
     this.callSign = unitDTO.callSign;
     this.unitDTO = unitDTO;
     this.core = core;
@@ -74,9 +89,14 @@ export default class Unit extends TransformNode {
     this.initSensors();
     this.initComms();
     this.initSignals();
+    this.initFuelTanks();
     this.initProPulsions();
     this.initMovement();
     this.initUi();
+
+    if (this.core.logMode) {
+      this.initLogger();
+    }
 
     this.syncAttchedUi();
   }
@@ -85,10 +105,10 @@ export default class Unit extends TransformNode {
   initSensors(): void {
     this.unitDTO.sensors.forEach((value) => {
       switch (value.type) {
-        case "radar":
+        case SensorDTO.TYPE.radar:
           this.sensors.push(new Radar(value, this));
           break;
-        case "irst":
+        case SensorDTO.TYPE.irst:
           this.sensors.push(new Irst(value, this))
           break;
       }
@@ -99,7 +119,7 @@ export default class Unit extends TransformNode {
   initComms() {
     this.unitDTO.comms.forEach((value) => {
       switch (value.type) {
-        case "comm":
+        case CommsDTO.TYPE.comm:
           this.comms.push(new Comm(<CommDTO>value.data, this));
           break;
       }
@@ -172,15 +192,44 @@ export default class Unit extends TransformNode {
     }
   }
 
+  // fuelTanks
+  initFuelTanks() {
+    this.unitDTO.fuelTanks.forEach((value) => {
+      switch (value.type) {
+        case FuelTankDTO.TYPE.aviationFuel:
+          if (value.detachable) {
+            this.fuelTanks.aviationFuel.unshift(new AviationFuelTank(value));
+          } else {
+            this.fuelTanks.aviationFuel.push(new AviationFuelTank(value));
+          }
+          break;
+        // case FuelTankDTO.TYPE.rocket:
+        //   if (value.detachable) {
+        //     this.fuelTanks.aviationFuel.unshift(new AviationFuelTank(value));
+        //   } else {
+        //     this.fuelTanks.aviationFuel.push(new AviationFuelTank(value));
+        //   }
+        //   break;
+      }
+    })
+  }
+
   // movement
   initProPulsions() {
+    // init engine
     this.unitDTO.propulsions.forEach((value) => {
       switch (value.type) {
-        case "jetEngine":
-          this.propulsions.push(new JetEngine())
+        case PropulsionDTO.TYPE.jetEngine:
+          this.propulsions.push(new JetEngine(value.data, this));
           break;
       }
     })
+  
+    // attach fueltanks to engines
+
+
+    // enable first engine
+    this.propulsions[0].enable = true;
   }
   
   initMovement() {
@@ -199,6 +248,7 @@ export default class Unit extends TransformNode {
   initUi() {
     this.initUnitIcon();
     this.initLastTimeBeenDetectedCounter();
+    this.initLogger();
   }
 
   initUnitIcon() {
@@ -275,6 +325,27 @@ export default class Unit extends TransformNode {
     this.LTBDCUpdated = true;
     this.LTBDCounter.isVisible = true;
     this.syncAttchedUi();
+  }
+
+  // logger
+  initLogger() {
+    this.logger = new TextBlock("logger");
+    this.logger.width = "120px";
+    this.logger.height = "120px";
+    this.logger.fontSize = "12px";
+    this.logger.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT
+    this.logger.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    this.logger.textWrapping = TextWrapping.WordWrap;
+
+    this.logger.color = "white";
+    this.logger.outlineColor = "white";
+
+    this.core.fullScrGUI.addControl(this.logger);
+    this.logger.linkOffsetX = 80;
+    this.logger.linkOffsetY = 50;
+    this.logger.linkWithMesh(this.attachedUi);
+
+    this.logger.isVisible = true;
   }
 
   syncAttchedUi() {

@@ -17,6 +17,9 @@ class Main {
   }
 
   async initEngine(canvas: HTMLCanvasElement) {
+    // const engine = new Engine(canvas);
+
+    // webGPU
     const engine = new WebGPUEngine(canvas);
     await engine.initAsync();
 

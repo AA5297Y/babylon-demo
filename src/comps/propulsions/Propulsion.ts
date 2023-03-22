@@ -1,9 +1,12 @@
 import Component from "../Component";
-import Altitude from "./define/Altitude";
+import { TYPE } from "./PropulsionDTO";
 
 export default class Propulsion extends Component {
-  type: String;
+  type: TYPE;
   name: String;
   enable: boolean;
-  acceleration: number;
+
+  altitude: number;
+  speed: number;
+  fuelConsumption: number;
 }

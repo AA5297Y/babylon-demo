@@ -2,11 +2,11 @@ import Throttle from "@/core/tool/Throttle";
 import Unit from "@/unit/Unit";
 import { float, LinesMesh, Mesh, MeshBuilder, Quaternion, Scene, Vector2, Vector3 } from "@babylonjs/core";
 import Sensor from "../Sensor";
-import SensorDTO from "../SensorDTO";
+import * as SensorDTO from "../SensorDTO";
 import RadarDTO from "./RadarDTO";
 
 export default class Radar extends Sensor {
-  type = "radar";
+  type = SensorDTO.TYPE.radar;
   radarDTO: RadarDTO;
 
   alyUi: LinesMesh;
@@ -19,7 +19,7 @@ export default class Radar extends Sensor {
 
   targetList: Unit[];
 
-  constructor(sensorDTO: SensorDTO, parent: Unit) {
+  constructor(sensorDTO: SensorDTO.SensorDTO, parent: Unit) {
     super(sensorDTO, parent);
 
     this.radarDTO = <RadarDTO>sensorDTO.data;
@@ -29,9 +29,11 @@ export default class Radar extends Sensor {
 
   // compute
   rcs2Range(rcs: float, angle: number = 0): float {
-    return this.radarDTO.esa ? 
-    (this.radarDTO.range1m2 * Math.pow(rcs, 1/4) * Math.cos(angle)) :
-    (this.radarDTO.range1m2 * Math.pow(rcs, 1/4));
+    if (this.radarDTO.esa) {
+      return this.radarDTO.range1m2 * Math.pow(rcs, 1/4) * Math.cos(angle * (Math.PI / 180));
+    } else {
+      return this.radarDTO.range1m2 * Math.pow(rcs, 1/4);
+    }
   }
 
   init() {
@@ -42,7 +44,7 @@ export default class Radar extends Sensor {
     const throttledScaning = Throttle(this.scaning, this.refreshRate);
     // update
     this.update = (): void => {
-      if (!this.passive && this.enable) {
+      if (!this.passive || this.enable) {
         // ui update
         if (this.parent.testFriendlyOrFoe()) {
           this.updateAlyUi();

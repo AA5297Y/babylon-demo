@@ -1,16 +1,16 @@
 import Unit from "../../unit/Unit";
 import Component from "../Component";
-import SensorDTO from "./SensorDTO";
+import * as SensorDTO from "./SensorDTO";
 
 export default class Sensor extends Component {
-  type: String;
+  type: SensorDTO.TYPE;
   name: String;
   passive: boolean;
   refreshRate: number;
 
   enable: boolean;
 
-  constructor(sensorDTO: SensorDTO, parent: Unit) {
+  constructor(sensorDTO: SensorDTO.SensorDTO, parent: Unit) {
     super(parent);
     this.name = sensorDTO.name
     this.passive = sensorDTO.passive;
