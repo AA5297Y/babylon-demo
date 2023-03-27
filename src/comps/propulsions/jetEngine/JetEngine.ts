@@ -30,19 +30,18 @@ export default class JetEngine extends Propulsion {
   }
 
   init() {
+    
+
     this.update = () => {
       if (this.available && this.enable) {
         this.updateAltitude();
         this.updateSpeed();
+
+        this.throttledFuelConsume(this);
       }
     }
     
     this.parent.core.scene.onBeforeRenderObservable.add(this.update)
-  }
-
-  // altitude
-  getAltitude2Ft(): number {
-    return this.parent.position.z / 6076;
   }
 
   updateAltitude() {

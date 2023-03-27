@@ -90,7 +90,7 @@ export default class Unit extends TransformNode {
     this.initComms();
     this.initSignals();
     this.initFuelTanks();
-    this.initProPulsions();
+    this.initPropulsions();
     this.initMovement();
     this.initUi();
 
@@ -215,18 +215,19 @@ export default class Unit extends TransformNode {
   }
 
   // movement
-  initProPulsions() {
-    // init engine
+  initPropulsions() {
+    // init propulsions
     this.unitDTO.propulsions.forEach((value) => {
       switch (value.type) {
         case PropulsionDTO.TYPE.jetEngine:
-          this.propulsions.push(new JetEngine(value.data, this));
+          const newEngine = new JetEngine(value.data, this);
+
+          // attche fuel tank
+          newEngine.fuelTanks = this.fuelTanks.aviationFuel;
+          this.propulsions.push(newEngine);
           break;
       }
     })
-  
-    // attach fueltanks to engines
-
 
     // enable first engine
     this.propulsions[0].enable = true;
@@ -330,19 +331,18 @@ export default class Unit extends TransformNode {
   // logger
   initLogger() {
     this.logger = new TextBlock("logger");
-    this.logger.width = "120px";
-    this.logger.height = "120px";
+    this.logger.width = "200px";
+    this.logger.height = "200px";
     this.logger.fontSize = "12px";
     this.logger.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT
     this.logger.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
     this.logger.textWrapping = TextWrapping.WordWrap;
 
     this.logger.color = "white";
-    this.logger.outlineColor = "white";
 
     this.core.fullScrGUI.addControl(this.logger);
-    this.logger.linkOffsetX = 80;
-    this.logger.linkOffsetY = 50;
+    this.logger.linkOffsetX = 115;
+    this.logger.linkOffsetY = 85;
     this.logger.linkWithMesh(this.attachedUi);
 
     this.logger.isVisible = true;

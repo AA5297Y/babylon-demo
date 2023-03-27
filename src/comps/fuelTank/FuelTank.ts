@@ -36,4 +36,8 @@ export default class FuelTank {
   fill(): void {
     this.amount = this.capacity;
   }
+
+  empty(): boolean {
+    return this.capacity == 0;
+  }
 } 

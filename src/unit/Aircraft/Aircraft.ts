@@ -58,9 +58,15 @@ export default class Aircraft extends Unit {
     let speed = 0;
     this.propulsions.forEach((value) => {
       if (value.enable) {
-        this.logger.text = "speed: " + value.speed + "\n" +
+        let logText = "speed: " + value.speed + "\n" +
         "altitude: " + value.altitude + "\n" + 
-        "fuelCons: " + value.fuelConsumption;
+        "fuelCons: " + value.fuelConsumption + "\n";
+        
+        this.fuelTanks.aviationFuel.forEach((value, index) => {
+          logText = logText.concat(index.toString() + ": ", value.amount + "/" + value.capacity + "\n");
+        })
+
+        this.logger.text = logText;
 
         speed = (value.speed / 3600) / 1000 * this.getEngine().getDeltaTime();
         return;
