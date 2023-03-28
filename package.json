@@ -33,5 +33,12 @@
     "url": "https://gitee.com/zhong_jian_wei/babylon-demo"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "css-loader": "^6.7.3",
+    "font-awesome": "^4.7.0",
+    "sass": "^1.60.0",
+    "sass-loader": "^13.2.2",
+    "style-loader": "^3.3.2"
+  }
 }

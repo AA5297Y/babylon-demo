@@ -1,17 +1,20 @@
-import { Camera, Engine, Scene, Vector3, WebGPUEngine } from "@babylonjs/core";
+import { WebGPUEngine } from "@babylonjs/core";
 import Core from "./core/Core";
 import '@babylonjs/inspector';
 
+import './scss/ui.scss';
+import 'font-awesome/css/font-awesome.min.css';
+
 class Main {
   constructor() {
-    const containerDiv = document.body;
+    const main = document.getElementById("main");
 
     const canvas = document.createElement("canvas");
     canvas.style.width = "100%";
     canvas.style.height = "100%";
     canvas.id = "canvas";
     
-    containerDiv.append(canvas);
+    main.append(canvas);
 
     this.initEngine(canvas);
   }

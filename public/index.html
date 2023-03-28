@@ -8,6 +8,30 @@
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
+    <div id="main"></div>
+    <div class="contextMenu">
+      <div class="caption">
+        <div class="nameField">
+          <div id="context_unitTag">Aircraft</div>
+          <div id="context_callSign">tiger1</div>
+          <div id="context_side">
+            red
+            <i class="fa fa-external-link"></i>
+          </div>
+        </div>
+      </div>
+      <div class="unitField">
+        <div class="unitTypeField">
+          <div id="context_unitClass">J-20</div>
+          <div id="context_unitLink">
+            <i class="fa fa-external-link"></i>
+          </div>
+        </div>
+      </div>
+      <div class="missionField">
+        <div 
+      </div>
+    </div>
   </body>
   <style>
     html {
@@ -20,6 +44,12 @@
       height: 100%;
       margin: 0;
       padding: 0;
+    }
+
+    #main {
+      position: fixed;
+      width: 100%;
+      height: 100%;
     }
   </style>
 </html>

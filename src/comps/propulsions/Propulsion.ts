@@ -11,6 +11,11 @@ export default class Propulsion extends Component {
   altitude: number;
   speed: number;
 
+  // update
+  update() {
+    //
+  }
+
   // fuel
   fuelTanks: FuelTank[] = [];
   fuelConsumption: number;

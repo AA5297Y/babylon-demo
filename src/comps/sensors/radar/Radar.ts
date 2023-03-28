@@ -9,6 +9,8 @@ export default class Radar extends Sensor {
   type = SensorDTO.TYPE.radar;
   radarDTO: RadarDTO;
 
+  throttledScaning: (...args) => void;
+
   alyUi: LinesMesh;
   foeUi: LinesMesh;
 
@@ -41,25 +43,9 @@ export default class Radar extends Sensor {
     this.guardRange = this.rcs2Range(this.radarDTO.maxRcs);
     this.drawArc(this.radarDTO.defaultRcs);
 
-    const throttledScaning = Throttle(this.scaning, this.refreshRate);
-    // update
-    this.update = (): void => {
-      if (!this.passive || this.enable) {
-        // ui update
-        if (this.parent.testFriendlyOrFoe()) {
-          this.updateAlyUi();
-        } else {
-          this.testUpdateFoeUi();
-        }
+    this.throttledScaning = Throttle(this.scaning, this.refreshRate);
 
-        // scanning;
-        throttledScaning(this);
-      } else {
-        this.disable();
-      }
-    }
-
-    this.parent.core.scene.onBeforeRenderObservable.add(this.update);
+    this.parent.core.scene.onBeforeRenderObservable.add(() => this.update());
   }
 
   // ui
@@ -133,6 +119,22 @@ export default class Radar extends Sensor {
 
     this.alyUi.isVisible = false;
     this.foeUi.isVisible = false;
+  }
+
+  update(): void {
+    if (!this.passive || this.enable) {
+      // ui update
+      if (this.parent.testFriendlyOrFoe()) {
+        this.updateAlyUi();
+      } else {
+        this.testUpdateFoeUi();
+      }
+
+      // scanning;
+      this.throttledScaning(this);
+    } else {
+      this.disable();
+    }
   }
 
   scaning() {

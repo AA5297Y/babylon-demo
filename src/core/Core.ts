@@ -27,6 +27,8 @@ export default class Core {
   cameraControl: CamController;
   contactManager: ContactManager;
 
+  selection: Unit[] = [];
+
   // scenario data
   scenarioReader: ScenarioReader = null;
   sides: Side[] = [];
@@ -86,5 +88,16 @@ export default class Core {
   // scenario read
   testScenarioReader() {
     this.scenarioReader = new ScenarioReader(this, NewScenario);
+  }
+
+  // contextMenu
+  handleRightClick() {
+    if (this.selection.length > 0) {
+      this.showUnitContextMenu();
+    }
+  }
+
+  showUnitContextMenu() {
+    console.log(this.selection[0]);
   }
 }

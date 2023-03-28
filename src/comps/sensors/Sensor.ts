@@ -18,6 +18,6 @@ export default class Sensor extends Component {
   }
 
   update(): void {
-    return
+    //
   }
 }

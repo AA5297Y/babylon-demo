@@ -127,14 +127,7 @@ export default class Unit extends TransformNode {
 
     this.resetComm();
 
-    this.updateComm = () => {
-      if (!this.lostComm && this.testFriendlyOrFoe()) {
-        this.visibility = Visibility.ally;
-        this.syncAttchedUi();
-      }
-    }
-
-    this.core.scene.onBeforeRenderObservable.add(this.updateComm)
+    this.core.scene.onBeforeRenderObservable.add(() => this.updateComm())
   }
 
   resetComm() {
@@ -147,7 +140,12 @@ export default class Unit extends TransformNode {
     })
   }
 
-  updateComm = (): void => {}
+  updateComm() {
+    if (!this.lostComm && this.testFriendlyOrFoe()) {
+      this.visibility = Visibility.ally;
+      this.syncAttchedUi();
+    }
+  }
 
   // Signal
   initSignals() {
@@ -237,6 +235,10 @@ export default class Unit extends TransformNode {
     // base class is static
   }
 
+  updateMovement() {
+    //
+  }
+
   getTargetBearing(other: Unit) {
     return Vector3.GetAngleBetweenVectors(
       this.up,
@@ -256,7 +258,9 @@ export default class Unit extends TransformNode {
     // 
   }
 
-  updateUi = () => {}
+  updateUi() {
+    //
+  }
 
   // visibility
   testFriendlyOrFoe(): boolean {

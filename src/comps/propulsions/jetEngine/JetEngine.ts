@@ -29,19 +29,18 @@ export default class JetEngine extends Propulsion {
     this.init();
   }
 
-  init() {
-    
+  init() {   
+    this.parent.core.scene.onBeforeRenderObservable.add(() => this.update())
+  }
 
-    this.update = () => {
-      if (this.available && this.enable) {
-        this.updateAltitude();
-        this.updateSpeed();
+  // update
+  update() {
+    if (this.available && this.enable) {
+      this.updateAltitude();
+      this.updateSpeed();
 
-        this.throttledFuelConsume(this);
-      }
+      this.throttledFuelConsume(this);
     }
-    
-    this.parent.core.scene.onBeforeRenderObservable.add(this.update)
   }
 
   updateAltitude() {
@@ -101,9 +100,5 @@ export default class JetEngine extends Propulsion {
         return;
       }
     }
-  }
-
-  update() {
-
   }
 }

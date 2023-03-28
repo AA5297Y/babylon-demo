@@ -134,12 +134,18 @@ export default class InputManager {
         case PointerEventTypes.POINTERDOWN:
           break;
         case PointerEventTypes.POINTERUP:
-          this.panScrStartPoint = null;
-          this.panScrShift = {x: 0, y: 0};
-          this.zoomLastValue = null;
-          this.zoomShift = 0;
+          if (this.mouseBtnMap(ev.event, this.mouseUpMap.m2)) {
+            if (this.panScrShift.x == 0 && this.panScrShift.y == 0 && this.zoomShift == 0) {
+              this.core.handleRightClick();
+            }
 
-          this.core.canvas.style.cursor = "default";
+            this.panScrStartPoint = null;
+            this.panScrShift = {x: 0, y: 0};
+            this.zoomLastValue = null;
+            this.zoomShift = 0;
+  
+            this.core.canvas.style.cursor = "default";
+          }
           break;
         case PointerEventTypes.POINTERMOVE:
           // pan

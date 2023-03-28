@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { EventState, PointerInfoPre, Vector3 } from "@babylonjs/core";
 import AircraftDTO from "./AircraftDTO";
 import Unit from "../Unit";
 import Core from "@/core/Core";
@@ -7,6 +7,7 @@ import { Image } from "@babylonjs/gui/2D/controls/image";
 import SpriteTool from "@/core/tool/SpriteTool";
 import Visibility from "../Visibility";
 import Side from "@/core/side/Side";
+import { Vector2WithInfo } from "@babylonjs/gui/2D/math2D";
 
 export default class Aircraft extends Unit {
   type = UnitDTO.TYPE.aircraft;
@@ -19,27 +20,25 @@ export default class Aircraft extends Unit {
 
   // override movement
   initMovement() {
-    this.updateMovement = () => {
-      if (this.target == null) {
-        this.turnAround();
-      } else {
-        this.turning();
-      }
-  
-      const forward = this.getForward();
-      const speed = this.getSpeed();
-
-      let x = this.position.x + forward.x * speed;
-      let y = this.position.y + forward.y * speed;
-      let z = this.position.z + forward.z * speed;
-  
-      this.position.set(x, y, z);
-    }
-
-    this.core.scene.onBeforeRenderObservable.add(this.updateMovement);
+    this.core.scene.onBeforeRenderObservable.add(() => this.updateMovement());
   }
 
-  updateMovement = (): void => {}
+  updateMovement() {
+    if (this.target == null) {
+      this.turnAround();
+    } else {
+      this.turning();
+    }
+
+    const forward = this.getForward();
+    const speed = this.getSpeed();
+
+    let x = this.position.x + forward.x * speed;
+    let y = this.position.y + forward.y * speed;
+    let z = this.position.z + forward.z * speed;
+
+    this.position.set(x, y, z);
+  }
 
   turning(): void {
     //
@@ -84,34 +83,45 @@ export default class Aircraft extends Unit {
     this.core.fullScrGUI.addControl(this.unitIcon);
     this.unitIcon.linkWithMesh(this.attachedUi);
 
-    this.updateUi = () => {
-      switch (this.visibility) {
-        case Visibility.invisible:
-          this.unitIcon.isVisible = false;
-          break;
-        case Visibility.unknow:
-          this.unitIcon.isVisible = true;
-          SpriteTool.unknowAir(this.unitIcon);
-          break;
-        case Visibility.friendly:
-          this.unitIcon.isVisible = true;
-          SpriteTool.friendlyAir(this.unitIcon);
-          break;
-        case Visibility.ally:
-          this.unitIcon.isVisible = true;
-          SpriteTool.alyAir(this.unitIcon);
-          break;
-        case Visibility.unfriendly:
-          this.unitIcon.isVisible = true;
-          SpriteTool.unFriendlyAir(this.unitIcon);
-          break;
-        case Visibility.enemy:
-          this.unitIcon.isVisible = true;
-          SpriteTool.enemeyAir(this.unitIcon);
-          break;
-      }
-    }
+    this.core.scene.onBeforeRenderObservable.add(() => this.updateUi());
 
-    this.core.scene.onBeforeRenderObservable.add(this.updateUi);
+    // ui event
+    this.unitIcon.onPointerUpObservable.add((...args) => this.clickEvent(...args));
+  }
+
+  // update ui
+  updateUi() {
+    switch (this.visibility) {
+      case Visibility.invisible:
+        this.unitIcon.isVisible = false;
+        break;
+      case Visibility.unknow:
+        this.unitIcon.isVisible = true;
+        SpriteTool.unknowAir(this.unitIcon);
+        break;
+      case Visibility.friendly:
+        this.unitIcon.isVisible = true;
+        SpriteTool.friendlyAir(this.unitIcon);
+        break;
+      case Visibility.ally:
+        this.unitIcon.isVisible = true;
+        SpriteTool.alyAir(this.unitIcon);
+        break;
+      case Visibility.unfriendly:
+        this.unitIcon.isVisible = true;
+        SpriteTool.unFriendlyAir(this.unitIcon);
+        break;
+      case Visibility.enemy:
+        this.unitIcon.isVisible = true;
+        SpriteTool.enemeyAir(this.unitIcon);
+        break;
+    }
+  }
+
+  // events
+  clickEvent(vec: Vector2WithInfo, ev: EventState) {
+    if (this.core.inputManager.mouseBtnMap(ev.userInfo.event, this.core.inputManager.mouseUpMap.m0)) {
+      this.core.selection = [this];
+    }
   }
 }

@@ -1,0 +1,81 @@
+$text: #226;
+$back: #779;
+$grey: #557;
+
+.contextMenu {
+  position: absolute;
+  width: 300px;
+  color: $text;
+  background: $back;
+
+  border-radius: 5px;
+  font-size: 12px;
+  overflow: hidden;
+
+  .caption {
+    width: auto;
+    padding: 5px;
+
+    .nameField {
+
+      #context_unitTag {
+        padding: 5px;
+        color: $back;
+        background-color: $text;
+        display: inline-block;
+        border-radius: 4px;
+      }
+
+      #context_callSign {
+        display: inline-block;
+      }
+
+      #context_side {
+        position: absolute;
+        right: 5px;
+        display: inline-block;
+        text-align: right;
+        padding: 5px;
+        color: $back;
+        background: $text;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .unitField {
+    width: auto;
+    padding: 5px;
+    
+    .unitTypeField {
+      #context_unitClass {
+        padding: 5px;
+        display: inline-block;
+      }
+
+      #context_unitLink {
+        display: inline-block;
+        position: absolute;
+        padding: 5px 7px;
+        right: 5px;
+        border-radius: 4px;
+        color: $back;
+        background: $text;
+      }
+    }
+  }
+
+  .missionField {
+
+  }
+
+  .tabs {
+    .tab {
+
+    }
+
+    .content {
+
+    }
+  }
+}
