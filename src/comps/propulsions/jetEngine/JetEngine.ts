@@ -35,6 +35,10 @@ export default class JetEngine extends Propulsion {
 
   // update
   update() {
+    if (this.parent.core.gamePaused()) {
+      return;
+    }
+
     if (this.available && this.enable) {
       this.updateAltitude();
       this.updateSpeed();

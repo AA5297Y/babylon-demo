@@ -7,6 +7,11 @@ import 'font-awesome/css/font-awesome.min.css';
 
 class Main {
   constructor() {
+    // prevent default contextmenu
+    window.document.addEventListener("contextmenu", (ev) => {
+      ev.preventDefault();
+    })
+
     const main = document.getElementById("main");
 
     const canvas = document.createElement("canvas");

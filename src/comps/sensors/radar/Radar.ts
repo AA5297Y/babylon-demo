@@ -122,6 +122,10 @@ export default class Radar extends Sensor {
   }
 
   update(): void {
+    if (this.parent.core.gamePaused()) {
+      return;
+    }
+
     if (!this.passive || this.enable) {
       // ui update
       if (this.parent.testFriendlyOrFoe()) {

@@ -1,4 +1,4 @@
-import { EventState, PointerInfoPre, Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core";
 import AircraftDTO from "./AircraftDTO";
 import Unit from "../Unit";
 import Core from "@/core/Core";
@@ -7,7 +7,6 @@ import { Image } from "@babylonjs/gui/2D/controls/image";
 import SpriteTool from "@/core/tool/SpriteTool";
 import Visibility from "../Visibility";
 import Side from "@/core/side/Side";
-import { Vector2WithInfo } from "@babylonjs/gui/2D/math2D";
 
 export default class Aircraft extends Unit {
   type = UnitDTO.TYPE.aircraft;
@@ -24,6 +23,10 @@ export default class Aircraft extends Unit {
   }
 
   updateMovement() {
+    if (this.core.gamePaused()) {
+      return;
+    }
+
     if (this.target == null) {
       this.turnAround();
     } else {
@@ -84,9 +87,6 @@ export default class Aircraft extends Unit {
     this.unitIcon.linkWithMesh(this.attachedUi);
 
     this.core.scene.onBeforeRenderObservable.add(() => this.updateUi());
-
-    // ui event
-    this.unitIcon.onPointerUpObservable.add((...args) => this.clickEvent(...args));
   }
 
   // update ui
@@ -115,13 +115,6 @@ export default class Aircraft extends Unit {
         this.unitIcon.isVisible = true;
         SpriteTool.enemeyAir(this.unitIcon);
         break;
-    }
-  }
-
-  // events
-  clickEvent(vec: Vector2WithInfo, ev: EventState) {
-    if (this.core.inputManager.mouseBtnMap(ev.userInfo.event, this.core.inputManager.mouseUpMap.m0)) {
-      this.core.selection = [this];
     }
   }
 }

@@ -1,5 +1,6 @@
-import { Action, ActionManager, ExecuteCodeAction, float, InterpolateValueAction, PointerEventTypes, Ray, SetValueAction, Vector2, Vector3, WebXRControllerMovement } from "@babylonjs/core";
+import { Action, ActionManager, ExecuteCodeAction, float, InterpolateValueAction, PointerEventTypes, PointerInfo, Ray, SetValueAction, Vector2, Vector3, WebXRControllerMovement } from "@babylonjs/core";
 import Core from "./Core";
+import Unit from "@/unit/Unit";
 
 export default class InputManager {
   core: Core;
@@ -19,9 +20,11 @@ export default class InputManager {
     yPst: 'arrowup',
     zNeg: 'x',
     zPst: 'z',
+    p: 'p',
+    pause: 'pause',
   };
 
-  // mouse  
+  // mouse
   mouseDownMap = {
     m0: {button: 0, buttons: 1},
     m1: {button: 1, buttons: 4},
@@ -50,6 +53,7 @@ export default class InputManager {
     m20: {button: -1, buttons: 3},
   }
 
+  // mouse coordinate
   panScrStartPoint: Vector2 = null;
   panScrShift = {x: 0, y: 0};
   resetPanScr() {
@@ -59,19 +63,22 @@ export default class InputManager {
   zoomLastValue: number = null;
   zoomShift = 0;
 
-  pickedPoint: Vector3 = null;
-
   constructor(core: Core) {
     this.core = core;
 
-    this.setCamAction();
+    this.setInputActions();
   }
 
   mouseBtnMap(ev: any, map: {button: number, buttons: number}): boolean {
-    return (ev.button == map.button && ev.buttons == map.buttons)
+    return (ev.event.button == map.button && ev.event.buttons == map.buttons)
   }
 
-  setCamAction() {
+  // mouse
+  mouseStayPositionWhileEvent () {
+    return this.panScrShift.x == 0 && this.panScrShift.y == 0 && this.zoomShift == 0;
+  }
+
+  setInputActions() {
     // key down
     this.core.scene.actionManager.registerAction(new ExecuteCodeAction(
       ActionManager.OnKeyDownTrigger, (ev) => {
@@ -97,6 +104,12 @@ export default class InputManager {
             break;
           case this.keyMap.zPst:
             this.z = 1;
+            break;
+          case this.keyMap.p:
+            this.core.gamePauseSw();
+            break;
+          case this.keyMap.pause:
+            this.core.gamePauseSw();
             break;
         }
       }
@@ -129,14 +142,25 @@ export default class InputManager {
     ))
 
     // mouse
-    this.core.scene.onPointerObservable.add((ev) => {
+    this.core.scene.onPointerObservable.add((ev, es) => {
       switch (ev.type) {
         case PointerEventTypes.POINTERDOWN:
+          if (this.mouseBtnMap(ev, this.mouseDownMap.m0)) {
+            this.handleLeftDown(ev);
+          }
           break;
         case PointerEventTypes.POINTERUP:
-          if (this.mouseBtnMap(ev.event, this.mouseUpMap.m2)) {
-            if (this.panScrShift.x == 0 && this.panScrShift.y == 0 && this.zoomShift == 0) {
-              this.core.handleRightClick();
+          // leftup
+          if (this.mouseBtnMap(ev, this.mouseUpMap.m0)) {
+            if (this.mouseStayPositionWhileEvent()) {
+              this.handleLeftUp(ev);
+            }
+          }
+          
+          // rightup
+          if (this.mouseBtnMap(ev, this.mouseUpMap.m2)) {
+            if (this.mouseStayPositionWhileEvent()) {
+              this.handleRightUp(ev);
             }
 
             this.panScrStartPoint = null;
@@ -149,7 +173,7 @@ export default class InputManager {
           break;
         case PointerEventTypes.POINTERMOVE:
           // pan
-          if (this.mouseBtnMap(ev.event, this.mouseOverMap.m2)) {
+          if (this.mouseBtnMap(ev, this.mouseOverMap.m2)) {
             if (this.panScrStartPoint == null) {
               this.panScrStartPoint = new Vector2(ev.event.clientX, ev.event.clientY);
               return;
@@ -160,7 +184,7 @@ export default class InputManager {
           }
 
           // zoom
-          if (this.mouseBtnMap(ev.event, this.mouseOverMap.m20)) {
+          if (this.mouseBtnMap(ev, this.mouseOverMap.m20)) {
             this.panScrShift = {x: 0, y: 0};
 
             if (this.zoomLastValue != null) {
@@ -173,4 +197,30 @@ export default class InputManager {
       }
     })
   }
+  
+  handleLeftUp (ev: PointerInfo) {
+    if (!this.core.selectTargetMode) {
+      this.core.clearSelection();
+    }
+  }
+
+  handleRightUp(ev: PointerInfo) {
+    if (this.core.selectTargetMode) {
+      this.core.selectTargetMode = false;
+    }
+    else {
+      if (this.core.selection.length > 0) {
+        this.core.showUnitContextMenu();
+      }
+    }
+  }
+
+  handleLeftDown(ev: PointerInfo) {
+    this.core.select(new Vector3(ev.pickInfo.pickedPoint.x, ev.pickInfo.pickedPoint.y, 0), new Vector2(ev.event.x, ev.event.y), ev.event.shiftKey)
+  }
+
+  handleRightDown(ev: PointerInfo) {
+
+  }
 }
+  

@@ -16,12 +16,13 @@ import Signal from "@/comps/signals/Signal";
 import { SignalDTO } from "@/comps/signals/SignalDTO";
 import Core from "@/core/Core";
 import Side from "@/core/side/Side";
-import { TransformNode, Vector3 } from "@babylonjs/core";
+import { EventState, TransformNode, Vector3 } from "@babylonjs/core";
 import { Control } from "@babylonjs/gui/2D/controls/control";
 import { Image } from "@babylonjs/gui/2D/controls/image";
 import { TextBlock, TextWrapping } from "@babylonjs/gui/2D/controls/textBlock";
 import * as UnitDTO from "./UnitDTO";
 import Visibility from "./Visibility";
+import { Vector2WithInfo } from "@babylonjs/gui/2D/math2D";
 
 export default class Unit extends TransformNode {
   attachedUi: TransformNode = null;
@@ -141,6 +142,10 @@ export default class Unit extends TransformNode {
   }
 
   updateComm() {
+    if (this.core.gamePaused()) {
+      return;
+    }
+
     if (!this.lostComm && this.testFriendlyOrFoe()) {
       this.visibility = Visibility.ally;
       this.syncAttchedUi();
@@ -250,6 +255,7 @@ export default class Unit extends TransformNode {
   // initUi
   initUi() {
     this.initUnitIcon();
+    
     this.initLastTimeBeenDetectedCounter();
     this.initLogger();
   }
